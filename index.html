@@ -25,7 +25,7 @@
    <div class="start-field">
     <canvas id="startCanvas"></canvas>
     <div class="start-center">
-     <span class="lbl">Procedure / 5 towers × 10 pairs, fixed sequence</span>
+     <span class="lbl">Procedure / 3 ranking rounds + matching + estimation</span>
      <div class="mode-row">
       <button id="dailyBtn" class="btn">[ Daily Mode ]</button>
       <button id="infiniteBtn" class="btn ghost">[ Infinite Mode ]</button>
@@ -46,13 +46,14 @@
     <canvas id="bgLayer"></canvas>
     <canvas id="fxLayer"></canvas>
     <div class="question" id="question"></div>
+    <div id="specialLayer" class="special-layer hidden"></div>
     <div class="readout hidden" id="readout"></div>
    </div>
    <div class="orient-bar bottom" id="bottomOrient"></div>
    <div id="controls">
-    <div class="status"><span class="lbl">Status</span><span class="v"><span id="statusNode" class="node hollow"></span><span id="statusTxt">Awaiting stack</span></span></div>
+    <div class="status"><span class="lbl">Status</span><span class="v"><span id="statusNode" class="node hollow"></span><span id="statusTxt">Awaiting answer</span></span></div>
     <button id="actionBtn" class="btn" disabled>Submit</button>
-    <div class="status right"><span class="lbl">Rule</span><span>10 pairs × 10 pts</span></div>
+    <div class="status right"><span class="lbl">Rule</span><span id="ruleTxt">3 comparisons / 100 pts</span></div>
    </div>
   </div>
  </section>
