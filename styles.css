@@ -61,13 +61,13 @@ background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(170,178,209,.
 .fig-cap{position:absolute;left:12px;bottom:10px;font-size:9px;letter-spacing:.14em;color:var(--ink);text-transform:uppercase;background:var(--paper);padding:2px 6px;border:1px solid var(--ink2)}
 
 /* ---------- GAME FIELD ---------- */
-.game-module{flex:1;min-height:0}
+.game-module{flex:1 1 0;min-height:0;overflow:hidden}
 /* Orientation bars live OUTSIDE #field, in normal document flow, so bricks can never cover them. */
 .orient-bar{flex:none;display:flex;align-items:center;justify-content:center;gap:9px;padding:9px 10px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;text-align:center}
 .orient-bar .arrow{font-size:13px;line-height:1}
 .orient-bar.top{background:var(--ink);color:var(--paper);border-bottom:1.5px solid var(--ink)}
 .orient-bar.bottom{background:var(--paper);color:var(--ink);border-top:1.5px solid var(--ink)}
-#field{position:relative;flex:1 1 auto;min-height:280px;overflow:hidden;background:linear-gradient(#fbfdff,#f4f8fd);touch-action:none;user-select:none;-webkit-user-select:none}
+#field{position:relative;flex:1 1 0;min-height:0;overflow:hidden;background:linear-gradient(#fbfdff,#f4f8fd);touch-action:none;user-select:none;-webkit-user-select:none}
 #bgLayer,#fxLayer{position:absolute;left:0;top:0;pointer-events:none}
 #bgLayer{z-index:0}#fxLayer{z-index:3}
 .question{position:absolute;z-index:1;top:14px;left:50%;transform:translateX(-50%);width:92%;text-align:center;font-size:16px;font-weight:600;letter-spacing:.02em}
@@ -123,7 +123,7 @@ background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(170,178,209,.
  main{padding:8px 8px;padding-left:max(8px,var(--sal));padding-right:max(8px,var(--sar));padding-bottom:max(8px,var(--sab))}
  .mod-head{flex-wrap:wrap;gap:3px 10px;padding:5px 10px}
  .orient-bar{font-size:13px;padding:8px 8px;letter-spacing:.06em}
- #field{min-height:260px}
+ #field{min-height:0}
  .question{font-size:14px;top:10px}
  .question small{font-size:9px;margin-top:3px}
  #controls{grid-template-columns:1fr 1fr;padding:10px 10px;gap:10px}
@@ -138,7 +138,7 @@ background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(170,178,209,.
 }
 /* Extra-short iPhones (SE, and any browser with a tall address bar showing) */
 @media (max-width:760px) and (max-height:700px){
- #field{min-height:220px}
+ #field{min-height:0}
  .brick{height:40px}
  .orient-bar{padding:6px 8px;font-size:12px}
  .mod-head{font-size:9px}
@@ -146,15 +146,15 @@ background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(170,178,209,.
 
 /* ---------- MATCHING / ESTIMATION ---------- */
 .special-layer{position:absolute;inset:0;z-index:6;pointer-events:none}
-.matching-mode{cursor:crosshair}
-.match-columns{position:absolute;inset:50px 24px 18px;display:grid;grid-template-columns:minmax(140px,1fr) minmax(90px,2fr) minmax(140px,1fr);align-items:stretch}
+.matching-mode{cursor:default}
+.match-columns{position:absolute;pointer-events:auto;cursor:default;inset:50px 24px 18px;display:grid;grid-template-columns:minmax(140px,1fr) minmax(90px,2fr) minmax(140px,1fr);align-items:stretch}
 .match-col{display:flex;flex-direction:column;justify-content:space-evenly;gap:8px;z-index:8}
 .match-mid{position:relative;z-index:7;min-width:0}
-#matchSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
-#matchSvg .match-line{stroke-width:2;pointer-events:stroke;cursor:crosshair;filter:none}
+#matchSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:auto}
+#matchSvg .match-line{stroke-width:3;pointer-events:stroke;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cg fill='none' stroke='%231D2C86' stroke-width='1.7' stroke-linecap='round'%3E%3Cpath d='M5 5l6 6m6-6l-6 6'/%3E%3Cpath d='M8 10L4 17m8-7l5 7'/%3E%3Ccircle cx='5' cy='5' r='2.4' fill='%23F2F0E9'/%3E%3Ccircle cx='17' cy='5' r='2.4' fill='%23F2F0E9'/%3E%3C/g%3E%3C/svg%3E") 5 5,not-allowed;filter:none}
 #matchSvg .match-temp{stroke:var(--ink);stroke-width:1.5;stroke-dasharray:4 4;pointer-events:none}
-.match-brick{position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:100%!important;height:46px!important;flex:none;cursor:crosshair!important;z-index:9}
-.match-brick .match-node{position:absolute;width:10px;height:10px;border:1.5px solid var(--ink);background:var(--paper);top:50%;transform:translateY(-50%);z-index:12}
+.match-brick{pointer-events:auto;position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:100%!important;height:46px!important;flex:none;cursor:crosshair!important;z-index:9}
+.match-brick .match-node{pointer-events:auto;position:absolute;width:10px;height:10px;border:1.5px solid var(--ink);background:var(--paper);top:50%;transform:translateY(-50%);z-index:12}
 .match-brick.city .match-node{right:-6px}.match-brick.country .match-node{left:-6px}
 .match-brick:hover .match-node,.match-brick .match-node:active{background:var(--ink)}
 .match-brick.right-brick{color:var(--ink)}
@@ -195,7 +195,6 @@ background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(170,178,209,.
 .estimate-band-row{display:grid;grid-template-columns:auto 1fr auto;gap:4px;align-items:center;font-size:8px}
 .band-scale{display:flex;align-items:center;gap:3px;font-size:8px}.band-gradient{height:7px;flex:1;border:1px solid var(--ink);background:linear-gradient(90deg,#2E6B45,#8A6E1A,#A23A30)}
 @media(max-width:760px){.estimate-bands{position:relative;left:auto;right:auto;bottom:auto;margin:0 10px 4px;grid-template-columns:1fr 1fr;overflow:auto}.estimate-band-row{min-width:135px}}
-.matching-mode{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M4 4l5 5m7-5l-5 5m-2 1l-3 3m4-4l3 3' fill='none' stroke='%231D2C86' stroke-width='1.6' stroke-linecap='round'/%3E%3Ccircle cx='4' cy='4' r='2' fill='%23F2F0E9' stroke='%231D2C86'/%3E%3Ccircle cx='16' cy='4' r='2' fill='%23F2F0E9' stroke='%231D2C86'/%3E%3C/svg%3E") 4 4, crosshair}
 /* Keep post-round scoring compact and out of the primary answer area. */
 .resultBanner{min-width:0;width:min(300px,42%);top:8px;left:auto;right:8px;transform:none}
 .resultBanner .rb-row{padding:6px 9px}
