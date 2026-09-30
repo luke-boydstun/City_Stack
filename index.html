@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>City Stack</title>
+<title>City Stack / Ranking Instrument</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -11,7 +11,7 @@
 <body>
 <div id="app">
 <header id="ribbon">
- <div class="rib-cell brand"><span class="node"></span>CITY STACK</div>
+ <div class="rib-cell brand"><span class="node"></span>CITY STACK<span class="dim">/ RANKING INSTRUMENT</span></div>
  <div class="rib-cell"><span class="lbl">Score</span><span id="scoreVal" class="num">000</span><span class="lbl">/ 500</span></div>
  <div class="rib-cell"><span class="lbl">Seq</span><div id="progress" class="progress"></div><span id="seqTxt" class="num">00/05</span></div>
  <div class="rib-cell meta"><span class="lbl">Dataset</span><span id="nTxt" class="num"></span><span class="lbl">Date</span><span id="dateTxt" class="num"></span></div>
@@ -25,7 +25,7 @@
    <div class="start-field">
     <canvas id="startCanvas"></canvas>
     <div class="start-center">
-     <span class="lbl">Procedure / 3 ranking rounds + matching + estimation</span>
+     <span class="lbl">Procedure / 5 towers × 10 pairs, fixed sequence</span>
      <div class="mode-row">
       <button id="dailyBtn" class="btn">[ Daily Mode ]</button>
       <button id="infiniteBtn" class="btn ghost">[ Infinite Mode ]</button>
@@ -46,14 +46,13 @@
     <canvas id="bgLayer"></canvas>
     <canvas id="fxLayer"></canvas>
     <div class="question" id="question"></div>
-    <div id="specialLayer" class="special-layer hidden"></div>
     <div class="readout hidden" id="readout"></div>
    </div>
    <div class="orient-bar bottom" id="bottomOrient"></div>
    <div id="controls">
-    <div class="status"><span class="lbl">Status</span><span class="v"><span id="statusNode" class="node hollow"></span><span id="statusTxt">Awaiting answer</span></span></div>
+    <div class="status"><span class="lbl">Status</span><span class="v"><span id="statusNode" class="node hollow"></span><span id="statusTxt">Awaiting stack</span></span></div>
     <button id="actionBtn" class="btn" disabled>Submit</button>
-    <div class="status right"><span class="lbl">Rule</span><span id="ruleTxt">3 comparisons / 100 pts</span></div>
+    <div class="status right"><span class="lbl">Rule</span><span>10 pairs × 10 pts</span></div>
    </div>
   </div>
  </section>
