@@ -6,147 +6,375 @@ const EXCLUDE_PLACEHOLDERS = true;
 const DATA = RAW_CITIES.filter(c => !(EXCLUDE_PLACEHOLDERS && (c.Country === 'Various' || /^Regional City \d+$/i.test(c.City))));
 
 const QUESTIONS = [
- {id:'LAT', key:'Latitude', name:'Latitude', title:'Rank these cities from North to South', top:'Northernmost', bottom:'Southernmost', fmt:latFmt},
- {id:'EST', key:'Year Founded', name:'Founding', title:'Rank these cities from Oldest to Newest', top:'Newest', bottom:'Oldest', fmt:yearFmt},
- {id:'POP', key:'Population', name:'Population', title:'Rank these cities by population', top:'Highest population', bottom:'Lowest population', fmt:popFmt},
- {id:'ELV', key:'Elevation', name:'Elevation', title:'Rank these cities by elevation', top:'Highest elevation', bottom:'Lowest elevation', fmt:elevFmt},
- {id:'GDP', key:'GDP', name:'GDP', title:'Rank these cities by GDP', top:'Highest GDP', bottom:'Lowest GDP', fmt:gdpFmt}
+ {id:'LAT', key:'Latitude',     name:'Latitude',   title:'Rank these cities from North to South', top:'Northernmost', bottom:'Southernmost', fmt:latFmt},
+ {id:'POP', key:'Population',   name:'Population', title:'Rank these cities by population',         top:'Highest population', bottom:'Lowest population', fmt:popFmt},
+ {id:'GDP', key:'GDP',          name:'GDP',        title:'Rank these cities by GDP',                top:'Highest GDP', bottom:'Lowest GDP', fmt:gdpFmt},
+ {id:'ELV', key:'Elevation',    name:'Elevation',  title:'Rank these cities by elevation',          top:'Highest elevation', bottom:'Lowest elevation', fmt:elevFmt},
+ {id:'EST', key:'Year Founded', name:'Founding',   title:'Rank these cities from Oldest to Newest', top:'Newest', bottom:'Oldest', fmt:yearFmt}
 ];
-const RANK_QUESTIONS = QUESTIONS;
+// Fixed round sequence, always played in this order regardless of mode:
+// North→South, Oldest→Newest, Population, Elevation, GDP.
+const FIXED_ORDER = ['LAT','EST','POP','ELV','GDP'].map(id=>QUESTIONS.find(q=>q.id===id));
 
+// Human-readable value labels shown on a brick once it has been submitted, e.g. "Pop. 3.6 million" / "Established 1804".
 function round1(v){return Math.round(v*10)/10}
 function latFmt(v){return `Lat. ${Math.abs(v).toFixed(2)}°${v<0?'S':'N'}`}
-function popFmt(v){const a=Math.abs(v);if(a>=1e6)return `Pop. ${round1(v/1e6)} million`;if(a>=1e3)return `Pop. ${round1(v/1e3)} thousand`;return `Pop. ${Math.round(v).toLocaleString('en-US')}`}
-function gdpFmt(v){const a=Math.abs(v);if(a>=1e12)return `GDP $${round1(v/1e12)} trillion`;if(a>=1e9)return `GDP $${round1(v/1e9)} billion`;if(a>=1e6)return `GDP $${round1(v/1e6)} million`;if(a>=1e3)return `GDP $${round1(v/1e3)} thousand`;return `GDP $${Math.round(v).toLocaleString('en-US')}`}
-function elevFmt(v){return `Elev. ${Math.round(v).toLocaleString('en-US')} ft`}
+function popFmt(v){const a=Math.abs(v);
+ if(a>=1e6)return `Pop. ${round1(v/1e6)} million`;
+ if(a>=1e3)return `Pop. ${round1(v/1e3)} thousand`;
+ return `Pop. ${Math.round(v).toLocaleString('en-US')}`}
+function gdpFmt(v){const a=Math.abs(v);
+ if(a>=1e12)return `GDP $${round1(v/1e12)} trillion`;
+ if(a>=1e9)return `GDP $${round1(v/1e9)} billion`;
+ if(a>=1e6)return `GDP $${round1(v/1e6)} million`;
+ if(a>=1e3)return `GDP $${round1(v/1e3)} thousand`;
+ return `GDP $${Math.round(v).toLocaleString('en-US')}`}
+function elevFmt(v){return `Elev. ${Math.round(v).toLocaleString('en-US')} m`}
 function yearFmt(v){return v<0?`Established ${Math.round(-v).toLocaleString('en-US')} BCE`:`Established ${Math.round(v)}`}
 
-const MATCH_SCORE={7:100,5:80,4:60,3:40,2:20,1:10,0:0};
-function pairwiseScore(values){let correct=0,total=0;for(let i=0;i<values.length;i++)for(let j=i+1;j<values.length;j++){total++;if(values[i]<=values[j])correct++}return {correct,total,score:Math.round(correct/Math.max(1,total)*100)};}
+/* ================= SCORING (pure) ================= */
+// valuesBottomToTop: metric values of the player's tower, bottom brick first.
+// The correct tower is ascending bottom→top for every question, so pair (i below j) is correct when value_i <= value_j.
+// Returns total correct pairs, score, and — per brick — how many incorrect pairs it participates in (0..4).
+function pairwiseScore(valuesBottomToTop){
+ const n=valuesBottomToTop.length,wrong=new Array(n).fill(0);let pairs=0;
+ for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
+  if(valuesBottomToTop[i]<=valuesBottomToTop[j])pairs++;else{wrong[i]++;wrong[j]++}
+ }
+ return {pairs,score:pairs*10,wrong};
+}
 
-const GRAD_FG=[[46,107,69],[138,110,26],[162,58,48]],GRAD_BG=[[220,230,214],[236,227,198],[239,217,210]];
-function lerp3(stops,t){const s=t<=.5?0:1,u=t<=.5?t*2:(t-.5)*2,a=stops[s],b=stops[s+1];return `rgb(${a.map((v,k)=>Math.round(v+(b[k]-v)*u)).join(',')})`}
-const gradFg=w=>lerp3(GRAD_FG,Math.min(1,w/4)),gradBg=w=>lerp3(GRAD_BG,Math.min(1,w/4));
-const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ================= GRADIENT (green → amber → red by inverted pairs) ================= */
+const GRAD_FG=[[46,107,69],[138,110,26],[162,58,48]];
+const GRAD_BG=[[220,230,214],[236,227,198],[239,217,210]];
+function lerp3(stops,t){const s=t<=.5?0:1,u=t<=.5?t*2:(t-.5)*2,a=stops[s],b=stops[s+1];
+ return `rgb(${a.map((v,k)=>Math.round(v+(b[k]-v)*u)).join(',')})`}
+const gradFg=w=>lerp3(GRAD_FG,Math.min(1,w/4)), gradBg=w=>lerp3(GRAD_BG,Math.min(1,w/4));
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function shuffle(a,rnd=Math.random){for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function strSeed(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return(h^h>>>16)>>>0}
+// Deterministic 32-bit hash of a string, used to seed the daily-mode RNG so every player gets the same puzzle on a given date.
+function strSeed(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}
+ h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return(h^h>>>16)>>>0}
 const pad=(n,l=2)=>String(n).padStart(l,'0');
 const pairsStrip=p=>`<div class="pairs">${Array.from({length:10},(_,k)=>`<i class="${k<p?'on':''}"></i>`).join('')}</div>`;
 const squareLine=p=>'🟩'.repeat(p)+'⬛'.repeat(10-p);
-const today=new Date(),isoDate=`${today.getFullYear()}.${pad(today.getMonth()+1)}.${pad(today.getDate())}`;
+const today=new Date();
+const isoDate=`${today.getFullYear()}.${pad(today.getMonth()+1)}.${pad(today.getDate())}`;
 
-function pickCities(q,rnd=Math.random,n=5){
+// One city per 20% band, no repeated country and no tied values within a question.
+function pickCities(q,rnd=Math.random){
  const pool=DATA.filter(c=>Number.isFinite(+c[q.key])).sort((a,b)=>a[q.key]-b[q.key]);
- const chosen=[],countries=new Set,vals=new Set,step=pool.length/n;
- for(let band=0;band<n;band++){
-  const lo=Math.floor(band*step),hi=Math.max(lo+1,Math.floor((band+1)*step));
-  let pick=shuffle(pool.slice(lo,hi),rnd).find(c=>!countries.has(c.Country)&&!vals.has(+c[q.key]));
-  if(!pick)pick=pool.find(c=>!countries.has(c.Country)&&!vals.has(+c[q.key]));
-  if(pick){chosen.push(pick);countries.add(pick.Country);vals.add(+pick[q.key])}
+ const n=pool.length,chosen=[],countries=new Set,vals=new Set;
+ const ok=c=>c&&!countries.has(c.Country)&&!vals.has(+c[q.key]);
+ for(let band=0;band<5;band++){
+  const lo=Math.floor(band*n/5),hi=Math.max(lo+1,Math.floor((band+1)*n/5));
+  let pick=shuffle(pool.slice(lo,hi),rnd).find(ok);
+  for(let r=1;!pick&&r<n;r++)pick=shuffle([pool[lo-r],pool[hi-1+r]],rnd).find(ok); // widen outward only if band is exhausted
+  if(!pick)pick=pool.find(ok)||pool[lo];
+  chosen.push(pick);countries.add(pick.Country);vals.add(+pick[q.key]);
  }
  return shuffle(chosen,rnd);
 }
-function pickMatching(rnd){
- const pool=shuffle(DATA.filter(c=>c.City&&c.Country),rnd),out=[],countries=new Set,cityNames=new Set;
- for(const c of pool){if(!countries.has(c.Country)&&!cityNames.has(c.City)){out.push(c);countries.add(c.Country);cityNames.add(c.City);if(out.length===7)break}}
- return out;
+
+/* ================= STATE ================= */
+let gameMode='infinite',order=[],round=0,scores=[],pairsList=[],current=null,bricks=[],refs=[],links=[],phase='idle';
+let drag=null,pointer=null,stableFrames=0,ready=false,lastT=0;
+const field=$('#field'),bg=$('#bgLayer'),fx=$('#fxLayer');
+const bgCtx=bg.getContext('2d'),fxCtx=fx.getContext('2d');
+let W=0,H=0,DPR=1;
+const brickH=()=>innerWidth<=760&&innerHeight<=700?40:46;
+const brickW=()=>W<560?150:W<840?172:196;
+const INK='#1D2C86',INK2='#AAB2D1';
+
+/* ================= RIBBON ================= */
+function updateRibbon(){
+ const total=scores.reduce((a,b)=>a+b,0);
+ $('#scoreVal').textContent=pad(total,3);
+ const p=$('#progress');p.innerHTML='';
+ for(let i=0;i<5;i++){const s=document.createElement('span');s.className='step'+(i<scores.length?' done':(i===round&&phase==='play'?' current':''));p.appendChild(s)}
+ $('#seqTxt').textContent=`${pad(phase==='idle'?0:Math.min(round+1,5))}/05`;
 }
-function pickEstimate(rnd){return shuffle(DATA.filter(c=>Number.isFinite(+c.Population)&&Number.isFinite(+c['Year Founded'])&&Number.isFinite(+c.Elevation)&&Number.isFinite(+c.GDP)&&Number.isFinite(+c.Latitude)),rnd)[0]}
+$('#nTxt').textContent=`N=${DATA.length}`;
+$('#dateTxt').textContent=isoDate;
+$('#startMeta').textContent=`N / ${DATA.length} · ${isoDate}`;
 
-let gameMode='infinite',round=0,scores=[],roundRecords=[],phase='idle',current=null,bricks=[],refs=[],links=[];
-let drag=null,pointer=null,stableFrames=0,ready=false,lastT=0,matchState=null,estimateState=null;
-const field=$('#field'),bg=$('#bgLayer'),fx=$('#fxLayer'),special=$('#specialLayer');
-const bgCtx=bg.getContext('2d'),fxCtx=fx.getContext('2d');let W=0,H=0,DPR=1;
-const brickH=()=>innerWidth<=760&&innerHeight<=700?40:46,brickW=()=>W<560?150:W<840?172:196,INK='#1D2C86',INK2='#AAB2D1';
+/* ================= START SCREEN PLOT ================= */
+function drawStart(){
+ const c=$('#startCanvas'),r=c.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);
+ c.width=r.width*d;c.height=r.height*d;const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);
+ const w=r.width,h=r.height;x.clearRect(0,0,w,h);
+ drawGrid(x,w,h,20,100);
+ x.strokeStyle=INK2;x.lineWidth=.6;x.setLineDash([2,4]);
+ for(let lon=-180;lon<=180;lon+=30){const px=20+(lon+180)/360*(w-40);x.beginPath();x.moveTo(px,20);x.lineTo(px,h-20);x.stroke()}
+ for(let lat=-60;lat<=60;lat+=30){const py=20+(90-lat)/180*(h-40);x.beginPath();x.moveTo(20,py);x.lineTo(w-20,py);x.stroke()}
+ x.setLineDash([]);
+ x.fillStyle=INK;x.font='9px IBM Plex Mono, monospace';
+ [-60,-30,0,30,60].forEach(lat=>x.fillText(`${lat>=0?lat+'N':-lat+'S'}`,24,20+(90-lat)/180*(h-40)-3));
+ const R=rng(7);
+ DATA.forEach(ci=>{const px=20+(ci.Longitude+180)/360*(w-40),py=20+(90-ci.Latitude)/180*(h-40);
+  const k=Math.max(1,Math.round(Math.log10(Math.max(ci.Population,10))-2)*2);
+  x.fillStyle='rgba(29,44,134,.45)';
+  for(let i=0;i<k;i++){const a=R()*6.283,rr=R()*R()*9;x.fillRect(px+Math.cos(a)*rr,py+Math.sin(a)*rr,1.2,1.2)}
+  x.fillStyle=INK;x.fillRect(px-1,py-1,2,2)});
+ $('#figCap').textContent=`FIG. 01 — CITY DATASET / LAT × LON / N=${DATA.length} / DENSITY ∝ LOG POP`;
+}
 
-function updateRibbon(){const total=scores.reduce((a,b)=>a+b,0);$('#scoreVal').textContent=pad(total,3);const p=$('#progress');p.innerHTML='';for(let i=0;i<5;i++){const s=document.createElement('span');s.className='step'+(i<scores.length?' done':(i===round&&phase!=='idle'?' current':''));p.appendChild(s)}$('#seqTxt').textContent=`${pad(phase==='idle'?0:Math.min(round+1,5))}/05`}
-$('#nTxt').textContent=`N=${DATA.length}`;$('#dateTxt').textContent=isoDate;$('#startMeta').textContent=`N / ${DATA.length} · ${isoDate}`;
+/* ================= FIELD LAYERS ================= */
+function drawGrid(x,w,h,minor,major){
+ x.lineWidth=1;
+ x.strokeStyle='rgba(217,220,231,.9)';x.beginPath();
+ for(let i=0;i<=w;i+=minor){x.moveTo(i+.5,0);x.lineTo(i+.5,h)}for(let j=0;j<=h;j+=minor){x.moveTo(0,j+.5);x.lineTo(w,j+.5)}x.stroke();
+ x.strokeStyle='rgba(170,178,209,.75)';x.beginPath();
+ for(let i=0;i<=w;i+=major){x.moveTo(i+.5,0);x.lineTo(i+.5,h)}for(let j=0;j<=h;j+=major){x.moveTo(0,j+.5);x.lineTo(w,j+.5)}x.stroke();
+ x.fillStyle=INK2;
+ for(let i=major;i<w;i+=major)for(let j=major;j<h;j+=major)if(((i+j)/major)%2===0)x.fillRect(i-1.5,j-1.5,4,4);
+ x.font='8px IBM Plex Mono, monospace';x.fillStyle=INK2;
+ for(let i=major;i<w;i+=major)x.fillText(pad(i,4),i+3,h-4);
+ for(let j=major;j<h;j+=major)x.fillText(pad(j,4),3,j-3);
+}
+function sizeField(){
+ W=field.clientWidth;H=field.clientHeight;DPR=Math.min(2,devicePixelRatio||1);
+ [bg,fx].forEach(c=>{c.width=W*DPR;c.height=H*DPR;c.style.width=W+'px';c.style.height=H+'px';c.getContext('2d').setTransform(DPR,0,0,DPR,0,0)});
+ drawBg();
+}
+function drawBg(){
+ const x=bgCtx;x.clearRect(0,0,W,H);drawGrid(x,W,H,16,80);
+ x.strokeStyle='rgba(170,178,209,.55)';x.lineWidth=.8;
+ x.beginPath();x.arc(W/2,H*.55,Math.min(W,H)*.36,0,Math.PI*2);x.stroke();
+ x.beginPath();x.moveTo(W/2,H*.55-Math.min(W,H)*.42);x.lineTo(W/2,H*.55+Math.min(W,H)*.42);x.moveTo(W/2-Math.min(W,H)*.42,H*.55);x.lineTo(W/2+Math.min(W,H)*.42,H*.55);x.stroke();
+ const q=current?current.q:QUESTIONS[0];
+ const vals=DATA.map(c=>+c[q.key]).filter(Number.isFinite).sort((a,b)=>a-b);
+ const pct=v=>{let lo=0,hi=vals.length;while(lo<hi){const m=(lo+hi)>>1;vals[m]<v?lo=m+1:hi=m}return lo/Math.max(1,vals.length-1)};
+ const R=rng(q.id.charCodeAt(0)*31+q.id.charCodeAt(2));
+ x.fillStyle='rgba(29,44,134,.26)';
+ DATA.forEach(c=>{const v=+c[q.key];if(!Number.isFinite(v))return;
+  const px=24+(c.Longitude+180)/360*(W-48);
+  const py=q.key==='Latitude'?24+(90-c.Latitude)/180*(H-48):H-24-pct(v)*(H-48);
+  for(let i=0;i<3;i++)x.fillRect(px+(R()-.5)*5,py+(R()-.5)*5,1.1,1.1)});
+ x.fillStyle=INK2;x.font='8px IBM Plex Mono, monospace';
+ x.save();x.translate(W-6,H/2);x.rotate(-Math.PI/2);x.textAlign='center';
+ x.fillText(q.key==='Latitude'?'Y / LATITUDE  ·  X / LONGITUDE':`Y / ${q.id} PERCENTILE  ·  X / LONGITUDE`,0,0);x.restore();
+}
 
-function drawStart(){const c=$('#startCanvas'),r=c.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);c.width=r.width*d;c.height=r.height*d;const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);const w=r.width,h=r.height;x.clearRect(0,0,w,h);drawGrid(x,w,h,20,100);x.strokeStyle=INK2;x.lineWidth=.6;x.setLineDash([2,4]);for(let lon=-180;lon<=180;lon+=30){const px=20+(lon+180)/360*(w-40);x.beginPath();x.moveTo(px,20);x.lineTo(px,h-20);x.stroke()}for(let lat=-60;lat<=60;lat+=30){const py=20+(90-lat)/180*(h-40);x.beginPath();x.moveTo(20,py);x.lineTo(w-20,py);x.stroke()}x.setLineDash([]);x.fillStyle=INK;x.font='9px IBM Plex Mono, monospace';[-60,-30,0,30,60].forEach(lat=>x.fillText(`${lat>=0?lat+'N':-lat+'S'}`,24,20+(90-lat)/180*(h-40)-3));const R=rng(7);DATA.forEach(ci=>{const px=20+(ci.Longitude+180)/360*(w-40),py=20+(90-ci.Latitude)/180*(h-40);x.fillStyle='rgba(29,44,134,.45)';for(let i=0;i<Math.max(1,Math.round(Math.log10(Math.max(ci.Population,10))-2)*2);i++){const a=R()*6.283,rr=R()*R()*9;x.fillRect(px+Math.cos(a)*rr,py+Math.sin(a)*rr,1.2,1.2)}x.fillStyle=INK;x.fillRect(px-1,py-1,2,2)});$('#figCap').textContent=`FIG. 01 — CITY DATASET / LAT × LON / N=${DATA.length} / DENSITY ∝ LOG POP`}
-function drawGrid(x,w,h,minor,major){x.lineWidth=1;x.strokeStyle='rgba(217,220,231,.9)';x.beginPath();for(let i=0;i<=w;i+=minor){x.moveTo(i+.5,0);x.lineTo(i+.5,h)}for(let j=0;j<=h;j+=minor){x.moveTo(0,j+.5);x.lineTo(w,j+.5)}x.stroke();x.strokeStyle='rgba(170,178,209,.75)';x.beginPath();for(let i=0;i<=w;i+=major){x.moveTo(i+.5,0);x.lineTo(i+.5,h)}for(let j=0;j<=h;j+=major){x.moveTo(0,j+.5);x.lineTo(w,j+.5)}x.stroke();x.fillStyle=INK2;for(let i=major;i<w;i+=major)for(let j=major;j<h;j+=major)if(((i+j)/major)%2===0)x.fillRect(i-1.5,j-1.5,4,4)}
-function sizeField(){W=field.clientWidth;H=field.clientHeight;DPR=Math.min(2,devicePixelRatio||1);[bg,fx].forEach(c=>{c.width=W*DPR;c.height=H*DPR;c.style.width=W+'px';c.style.height=H+'px';c.getContext('2d').setTransform(DPR,0,0,DPR,0,0)});drawBg()}
-function drawBg(){const x=bgCtx;x.clearRect(0,0,W,H);drawGrid(x,W,H,16,80);if(phase==='match'||phase==='matchResult')return;x.strokeStyle='rgba(170,178,209,.55)';x.lineWidth=.8;x.beginPath();x.arc(W/2,H*.55,Math.min(W,H)*.36,0,Math.PI*2);x.stroke();x.beginPath();x.moveTo(W/2,H*.13);x.lineTo(W/2,H*.97);x.moveTo(W*.08,H*.55);x.lineTo(W*.92,H*.55);x.stroke()}
-function drawFx(){const x=fxCtx;x.clearRect(0,0,W,H);if(phase==='rankResult')return;if(pointer&&phase==='rank'){x.strokeStyle='rgba(29,44,134,.22)';x.lineWidth=1;x.setLineDash([3,4]);x.beginPath();x.moveTo(0,pointer.y+.5);x.lineTo(W,pointer.y+.5);x.moveTo(pointer.x+.5,0);x.lineTo(pointer.x+.5,H);x.stroke();x.setLineDash([])}}
+function drawFx(){
+ const x=fxCtx;x.clearRect(0,0,W,H);
+ const ro=$('#readout');
+ if(pointer&&phase==='play'){
+  x.strokeStyle='rgba(29,44,134,.22)';x.lineWidth=1;x.setLineDash([3,4]);
+  x.beginPath();x.moveTo(0,pointer.y+.5);x.lineTo(W,pointer.y+.5);x.moveTo(pointer.x+.5,0);x.lineTo(pointer.x+.5,H);x.stroke();x.setLineDash([]);
+  x.fillStyle=INK;x.fillRect(pointer.x-2,pointer.y-2,5,5);
+  ro.classList.remove('hidden');ro.textContent=`X ${pad(Math.round(pointer.x),4)} · Y ${pad(Math.round(H-pointer.y),4)}`;
+  ro.style.left=Math.min(W-110,pointer.x+10)+'px';ro.style.top=Math.max(4,pointer.y-22)+'px';
+ }else ro.classList.add('hidden');
+ if(drag){
+  const b=drag.b,cx=b.x+b.w/2,cy=b.y+b.h/2;
+  x.strokeStyle=INK;x.lineWidth=1;x.beginPath();x.moveTo(drag.ox,drag.oy);x.lineTo(cx,cy);x.stroke();
+  x.fillStyle=INK;x.fillRect(drag.ox-3,drag.oy-3,6,6);
+  x.strokeRect(cx-3.5,cy-3.5,7,7);
+  const len=Math.hypot(cx-drag.ox,cy-drag.oy);
+  x.font='9px IBM Plex Mono, monospace';x.fillText(`Δ ${Math.round(len)}PX`,(drag.ox+cx)/2+6,(drag.oy+cy)/2-6);
+ }
+ if(phase==='play'&&ready){
+  const top=Math.min(...bricks.map(b=>b.y)),right=Math.max(...bricks.map(b=>b.x+b.w))+14;
+  const lx=Math.min(W-10,right);
+  x.strokeStyle=INK;x.lineWidth=1;x.beginPath();x.moveTo(lx,top);x.lineTo(lx,H);x.moveTo(lx-5,top+.5);x.lineTo(lx+5,top+.5);x.stroke();
+  bricks.forEach(b=>{x.fillStyle=INK;x.fillRect(lx-2,b.y-2,4,4)});
+  x.save();x.translate(lx+11,top+(H-top)/2);x.rotate(-Math.PI/2);x.textAlign='center';x.font='600 9px IBM Plex Mono, monospace';x.fillText('STACK / 05 / VERIFIED',0,0);x.restore();
+ }
+ if(phase==='result'){
+  x.lineWidth=1;x.setLineDash([2,3]);
+  links.forEach(l=>{x.strokeStyle=l.c;x.fillStyle=l.c;x.beginPath();x.moveTo(l.x1,l.y1);x.lineTo(l.x2,l.y2);x.stroke();
+   x.fillRect(l.x1-2,l.y1-2,4,4);x.fillRect(l.x2-2,l.y2-2,4,4)});
+  x.setLineDash([]);
+ }
+}
 
+/* ================= ROUND ================= */
+function startGame(mode){
+ gameMode=mode;order=FIXED_ORDER;round=0;scores=[];pairsList=[];
+ show('#gameScreen');loadRound();
+}
 function show(sel){['#startScreen','#gameScreen','#endScreen'].forEach(s=>$(s).classList.toggle('hidden',s!==sel))}
-function clearField(){field.querySelectorAll('.brick,.resultBanner,.caption').forEach(e=>e.remove());special.innerHTML='';special.classList.add('hidden');refs=[];links=[];field.classList.remove('frozen','matching-mode','estimate-mode');drag=null;pointer=null;matchState=null;estimateState=null}
-function startGame(mode){gameMode=mode;round=0;scores=[];roundRecords=[];phase='idle';show('#gameScreen');loadRound()}
-function dailyRnd(label){return gameMode==='daily'?rng(strSeed(`${isoDate}|${label}|${round}`)):Math.random}
-function loadRound(){clearField();const b=$('#actionBtn');b.textContent='Submit';b.disabled=true;sizeField();
- if(round<3){loadRank();return}if(round===3){loadMatch();return}loadEstimate()}
-
-/* ---------- RANKING ---------- */
-function loadRank(){phase='rank';stableFrames=0;ready=false;const q=RANK_QUESTIONS[round];const rnd=dailyRnd(`rank-${q.id}`);const cities=pickCities(q,rnd,5);current={type:'rank',q,cities};
- $('#qCode').innerHTML=`<span class="lbl">Ref</span>Q / ${pad(round+1)} — ${q.id}`;$('#qMetric').innerHTML=`<span class="lbl">Metric</span>${q.name.toUpperCase()}`;$('#modeTag').innerHTML=`<span class="lbl">Mode</span>${gameMode==='daily'?'DAILY':'INFINITE'}`;$('#question').innerHTML=`${esc(q.title)}<small>Drag bricks · build one tower · bottom → top</small>`;$('#topOrient').innerHTML=`<span class="arrow">▲</span>Top / ${esc(q.top)}`;$('#bottomOrient').innerHTML=`<span class="arrow">▼</span>Bottom / ${esc(q.bottom)}`;$('#ruleTxt').textContent='10 comparisons / 100 pts';setStatus('Awaiting stack',false);spawnRank(cities);updateRibbon()}
-function spawnRank(cities){
- bricks=[];
- const bw=brickW(),bh=brickH();
- const cols=Math.max(1,Math.min(5,Math.floor((W-16)/(bw+14))));
- const slots=shuffle([...Array(cities.length).keys()],gameMode==='daily'?dailyRnd(`rank-layout-${current.q.id}`):Math.random);
- cities.forEach((city,i)=>{
+function clearField(){field.querySelectorAll('.brick,.resultBanner,.caption').forEach(e=>e.remove());refs=[];links=[];field.classList.remove('frozen')}
+function loadRound(){
+ clearField();phase='play';ready=false;stableFrames=0;
+ const q=order[round];
+ // Daily mode seeds city selection from the date + question id + round, so every player sees the same 5 cities that day.
+ const rnd=gameMode==='daily'?rng(strSeed(`${isoDate}|${q.id}|${round}`)):Math.random;
+ current={q,cities:pickCities(q,rnd)};
+ $('#qCode').innerHTML=`<span class="lbl">Ref</span>Q / ${pad(round+1)} — ${q.id}`;
+ $('#qMetric').innerHTML=`<span class="lbl">Metric</span>${q.name.toUpperCase()}`;
+ $('#modeTag').innerHTML=`<span class="lbl">Mode</span>${gameMode==='daily'?'DAILY':'INFINITE'}`;
+ $('#question').innerHTML=`${esc(q.title)}<small>Drag bricks · build one tower · bottom → top</small>`;
+ $('#topOrient').innerHTML=`<span class="arrow">▲</span>Top / ${esc(q.top)}`;
+ $('#bottomOrient').innerHTML=`<span class="arrow">▼</span>Bottom / ${esc(q.bottom)}`;
+ setStatus('Awaiting stack',false);
+ const b=$('#actionBtn');b.textContent='Submit';b.disabled=true;
+ sizeField();spawn();updateRibbon();
+}
+function spawn(){
+ bricks=[];const bw=brickW(),bh=brickH(),cols=Math.max(1,Math.min(5,Math.floor((W-16)/(bw+14))));
+ const slots=shuffle([...Array(5).keys()]);
+ current.cities.forEach((city,i)=>{
   const el=document.createElement('div');el.className='brick';el.style.width=bw+'px';el.style.height=bh+'px';
   el.innerHTML=`<span class="b-label">${esc(city.City)}, ${esc(city.Country)}</span><span class="b-val"></span>`;
   field.appendChild(el);
-  const slot=slots[i],col=slot%cols,row=Math.floor(slot/cols);
-  const span=cols===1?0:(W-bw-16)/Math.max(1,cols-1);
+  const s=slots[i],col=s%cols,row=Math.floor(s/cols);
+  const span=(W-bw-16)/Math.max(1,cols-1);
   const x=cols===1?(W-bw)/2:8+col*span+(Math.random()-.5)*10;
   const b={el,city,x:Math.max(0,Math.min(W-bw,x)),y:8+row*(bh+8)+Math.random()*6,vx:0,vy:0,w:bw,h:bh};
-  bricks.push(b);
-  el.addEventListener('pointerdown',e=>beginRankDrag(e,b));
-  render(b);
- })
+  bricks.push(b);el.addEventListener('pointerdown',e=>beginDrag(e,b));render(b);
+ });
 }
 function render(b){b.el.style.transform=`translate(${b.x}px,${b.y}px)`}
 function setStatus(t,on){$('#statusTxt').textContent=t;$('#statusNode').className='node'+(on?'':' hollow')}
-function local(e){const r=field.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
-function beginRankDrag(e,b){if(phase!=='rank')return;e.preventDefault();const p=local(e);drag={b,offX:p.x-b.x,offY:p.y-b.y,t:performance.now()};b.vx=b.vy=0;b.el.classList.add('dragging')}
-window.addEventListener('pointermove',e=>{const p=local(e);pointer=(p.x>=0&&p.y>=0&&p.x<=W&&p.y<=H)?p:null;if(!drag||phase!=='rank')return;const b=drag.b,now=performance.now(),f=Math.max(1,(now-drag.t)/16.67),nx=Math.max(0,Math.min(W-b.w,p.x-drag.offX)),ny=Math.max(0,Math.min(H-b.h,p.y-drag.offY));b.vx=Math.max(-18,Math.min(18,(nx-b.x)/f));b.vy=Math.max(-18,Math.min(18,(ny-b.y)/f));b.x=nx;b.y=ny;drag.t=now;render(b)});
+
+/* ================= INPUT ================= */
+function local(e){const r=field.getBoundingClientRect();return{x:e.clientX-r.left-field.clientLeft,y:e.clientY-r.top-field.clientTop}}
+function beginDrag(e,b){
+ if(phase!=='play')return;e.preventDefault();
+ const p=local(e);drag={b,offX:p.x-b.x,offY:p.y-b.y,ox:b.x+b.w/2,oy:b.y+b.h/2,t:performance.now()};
+ b.vx=b.vy=0;b.el.classList.add('dragging');
+}
+window.addEventListener('pointermove',e=>{
+ const p=local(e);pointer=(p.x>=0&&p.y>=0&&p.x<=W&&p.y<=H)?p:null;
+ if(!drag)return;
+ const b=drag.b,now=performance.now(),f=Math.max(1,(now-drag.t)/16.67);
+ const nx=Math.max(0,Math.min(W-b.w,p.x-drag.offX)),ny=Math.max(0,Math.min(H-b.h,p.y-drag.offY));
+ b.vx=Math.max(-18,Math.min(18,(nx-b.x)/f));b.vy=Math.max(-18,Math.min(18,(ny-b.y)/f));
+ b.x=nx;b.y=ny;drag.t=now;render(b);
+});
 function endDrag(){if(!drag)return;drag.b.el.classList.remove('dragging');drag.b.vx*=.5;drag.b.vy*=.5;drag=null}
-window.addEventListener('pointerup',endDrag);window.addEventListener('pointercancel',endDrag);field.addEventListener('pointerleave',()=>pointer=null);
-function step(dt){for(const b of bricks){if(drag&&drag.b===b)continue;b.vy=Math.min(20,b.vy+.55*dt);b.vx*=Math.pow(.985,dt);b.x+=b.vx*dt;b.y+=b.vy*dt;if(b.x<0){b.x=0;b.vx=-b.vx*.2}if(b.x+b.w>W){b.x=W-b.w;b.vx=-b.vx*.2}if(b.y+b.h>=H){b.y=H-b.h;b.vy=0;b.vx*=.8}}for(let pass=0;pass<5;pass++)for(let i=0;i<bricks.length;i++)for(let j=i+1;j<bricks.length;j++)collide(bricks[i],bricks[j]);for(const b of bricks){b.x=Math.max(0,Math.min(W-b.w,b.x));if(b.y+b.h>H){b.y=H-b.h;b.vy=0}}}
-function collide(a,b){if(!(a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y))return;const ox=Math.min(a.x+a.w-b.x,b.x+b.w-a.x),oy=Math.min(a.y+a.h-b.y,b.y+b.h-a.y),da=drag&&drag.b===a,db=drag&&drag.b===b;if(oy<=ox){const up=a.y<b.y?a:b,lo=up===a?b:a;if(drag&&drag.b===up){lo.y+=oy;lo.vy=Math.max(0,lo.vy)}else{up.y-=oy;up.vy=0;up.vx*=.86}}else if(da&&!db){b.x+=(a.x<b.x?-ox:ox);b.vx=0}else if(db&&!da){a.x+=(a.x<b.x?-ox:ox);a.vx=0}}
-function towerOK(){if(drag||bricks.length!==5)return false;const o=bricks.slice().sort((a,b)=>b.y-a.y);if(Math.abs(o[0].y+o[0].h-H)>3)return false;for(let i=0;i<o.length-1;i++){const lo=o[i],up=o[i+1],gap=lo.y-(up.y+up.h),cx=up.x+up.w/2;if(Math.abs(gap)>3||cx<lo.x||cx>lo.x+lo.w)return false}return o.every(b=>Math.abs(b.vx)<.35&&Math.abs(b.vy)<.8)}
-function showRankResult(){phase='rankResult';field.classList.add('frozen');const q=current.q,tower=bricks.slice().sort((a,b)=>b.y-a.y),values=tower.map(b=>+b.city[q.key]),res=pairwiseScore(values);scores.push(res.score);roundRecords.push({kind:'rank',score:res.score,correct:res.correct,total:res.total,label:q.name});tower.forEach(b=>{b.el.classList.add('graded');b.el.style.setProperty('--c',gradFg(res.total-res.correct));b.el.style.setProperty('--cb',gradBg(res.total-res.correct));b.el.querySelector('.b-val').textContent=q.fmt(+b.city[q.key])});const correct=current.cities.slice().sort((a,b)=>a[q.key]-b[q.key]);const minX=Math.min(...tower.map(b=>b.x)),maxX=Math.max(...tower.map(b=>b.x+b.w)),S=maxX-minX,gap=Math.max(18,Math.min(90,W-2*S-20)),left=Math.max(4,(W-(2*S+gap))/2),dx=left-minX,off=S+gap;tower.forEach(b=>{b.x+=dx;render(b)});refs=correct.map((c,i)=>{const el=document.createElement('div');el.className='brick ref';el.style.width=tower[i].w+'px';el.style.height=tower[i].h+'px';el.innerHTML=`<span class="b-label">${esc(c.City)}, ${esc(c.Country)}</span><span class="b-val">${esc(q.fmt(+c[q.key]))}</span>`;field.appendChild(el);const r={el,x:tower[i].x+off,y:tower[i].y,w:tower[i].w,h:tower[i].h};render(r);return r});links=tower.map(b=>{const r=refs[correct.indexOf(b.city)];return{x1:b.x+b.w,y1:b.y+b.h/2,x2:r.x,y2:r.y+r.h/2,c:INK}});caption(`<span class="node hollow"></span>Submitted / your tower`,left,Math.min(...tower.map(b=>b.y))-20);caption(`<span class="node"></span>Reference / correct order`,left+off,Math.min(...tower.map(b=>b.y))-20);const ban=document.createElement('div');ban.className='resultBanner';ban.innerHTML=`<div class="rb-row"><span class="rb-main"><span class="node"></span>You got ${res.correct}/${res.total} comparisons correct.</span><span class="num">${res.score}/100</span></div><div class="rb-row"><span class="lbl">Score</span>${pairsStrip(res.correct*10)}<span class="num">${res.correct}/${res.total}</span></div>`;field.appendChild(ban);setStatus(`Scored / ${pad(res.score,3)}`,true);$('#actionBtn').textContent='Continue';$('#actionBtn').disabled=false;updateRibbon()}
+window.addEventListener('pointerup',endDrag);window.addEventListener('pointercancel',endDrag);
+field.addEventListener('pointerleave',()=>{pointer=null});
 
-/* ---------- MATCHING ---------- */
-function loadMatch(){phase='match';const rnd=dailyRnd('matching');const cities=pickMatching(rnd);current={type:'match',cities};$('#qCode').innerHTML='<span class="lbl">Ref</span>Q / 04 — MATCH';$('#qMetric').innerHTML='<span class="lbl">Metric</span>MATCHING';$('#modeTag').innerHTML=`<span class="lbl">Mode</span>${gameMode==='daily'?'DAILY':'INFINITE'}`;$('#question').innerHTML='Match each city to its country<small>Drag from a node to the proposed pair · drag across a line to cut it</small>';$('#topOrient').innerHTML='<span class="arrow">←</span>CITY';$('#bottomOrient').innerHTML='<span class="arrow">COUNTRY</span><span class="arrow">→</span>';$('#ruleTxt').textContent='7 pairs / 100 pts';setStatus('Connect all 7 pairs',false);field.classList.add('matching-mode');renderMatch(cities);updateRibbon()}
-function renderMatch(cities){special.classList.remove('hidden');special.innerHTML='<div class="match-columns"><div id="matchLeft" class="match-col"></div><div class="match-mid"><svg id="matchSvg"></svg></div><div id="matchRight" class="match-col"></div></div>';const left=$('#matchLeft'),right=$('#matchRight');const leftCities=shuffle(cities.slice(),dailyRnd('match-left')),rightCountries=shuffle(cities.map(c=>c.Country),dailyRnd('match-right'));leftCities.forEach(c=>left.appendChild(matchBrick(c.City,'city',c)));rightCountries.forEach(country=>right.appendChild(matchBrick(country,'country',country)));matchState={cities:leftCities,countries:rightCountries,connections:new Map,reverse:new Map,drag:null,cutting:null};requestAnimationFrame(updateMatchGeometry)}
-function matchBrick(label,type,value){const el=document.createElement('div');el.className='brick match-brick '+type;el.dataset.value=typeof value==='string'?value:value.City;el.innerHTML=`<span class="b-label">${esc(label)}</span><span class="match-node" data-type="${type}"></span>`;if(type==='country')el.classList.add('right-brick');const node=el.querySelector('.match-node');node.addEventListener('pointerdown',e=>startMatchLink(e,el,type));return el}
-function matchNodes(){return [...field.querySelectorAll('.match-node')]}
-function nodePoint(el){const n=el.querySelector('.match-node'),r=n.getBoundingClientRect(),fr=field.getBoundingClientRect();return{x:r.left+ r.width/2-fr.left,y:r.top+r.height/2-fr.top}}
-function startMatchLink(e,el,type){if(phase!=='match')return;e.preventDefault();e.stopPropagation();const existing=type==='city'?matchState.connections.get(el.dataset.value):matchState.reverse.get(el.dataset.value);if(existing)removeConnection(existing.city,existing.country);const p=nodePoint(el);matchState.drag={type,el,start:p,x:p.x,y:p.y};field.setPointerCapture?.(e.pointerId)}
-field.addEventListener('pointermove',e=>{if(phase!=='match'||!matchState)return;const p=local(e);if(matchState.cutting){const con=matchState.connections.get(matchState.cutting.city);if(con){const a=nodePoint([...field.querySelectorAll('.city')].find(x=>x.dataset.value===con.city)),b=nodePoint([...field.querySelectorAll('.country')].find(x=>x.dataset.value===con.country));const vx=b.x-a.x,vy=b.y-a.y,wx=p.x-a.x,wy=p.y-a.y,t=Math.max(0,Math.min(1,(wx*vx+wy*vy)/(vx*vx+vy*vy||1))),dx=p.x-(a.x+t*vx),dy=p.y-(a.y+t*vy);if(Math.hypot(dx,dy)<14){removeConnection(con.city,con.country);matchState.cutting.moved=true}}return}if(!matchState.drag)return;matchState.drag.x=p.x;matchState.drag.y=p.y;updateMatchSvg()});field.addEventListener('pointerup',e=>{if(phase!=='match'||!matchState?.drag){if(phase==='match'&&matchState?.cutting){const c=matchState.cutting;removeConnection(c.city,c.country);matchState.cutting=null}try{field.releasePointerCapture?.(e.pointerId)}catch(_){}return;}const d=matchState.drag,p=local(e),target=matchNodes().find(n=>{const r=n.getBoundingClientRect(),fr=field.getBoundingClientRect(),x=p.x+fr.left,y=p.y+fr.top;return x>=r.left-8&&x<=r.right+8&&y>=r.top-8&&y<=r.bottom+8});if(target&&target!==d.el.querySelector('.match-node')){const targetBrick=target.parentElement,targetType=target.dataset.type;if(targetType!==d.type){const city=d.type==='city'?d.el.dataset.value:targetBrick.dataset.value,country=d.type==='country'?d.el.dataset.value:targetBrick.dataset.value;if(matchState.connections.has(city))removeConnection(city,country);const prior=matchState.reverse.get(country);if(prior)removeConnection(prior.city,prior.country);matchState.connections.set(city,{city,country});matchState.reverse.set(country,{city,country})}}matchState.drag=null;updateMatchSvg();setMatchReady();try{field.releasePointerCapture?.(e.pointerId)}catch(_){} });
-function removeConnection(city,country){matchState.connections.delete(city);matchState.reverse.delete(country);updateMatchSvg();setMatchReady()}
-function setMatchReady(){const ready=matchState&&matchState.connections.size===7;$('#actionBtn').disabled=!ready;setStatus(ready?'7 pairs ready':'Connect all 7 pairs',ready)}
-function updateMatchGeometry(){updateMatchSvg()}
-function updateMatchSvg(){const svg=$('#matchSvg');if(!svg||!matchState)return;svg.setAttribute('width',W);svg.setAttribute('height',H);svg.innerHTML='';for(const c of matchState.connections.values())drawMatchLine(svg,c.city,c.country,matchResultColor(c));if(matchState.drag){const a=nodePoint(matchState.drag.el),line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',matchState.drag.x);line.setAttribute('y2',matchState.drag.y);line.setAttribute('class','match-temp');svg.appendChild(line)}}
-function drawMatchLine(svg,city,country,color){const a=nodePoint([...field.querySelectorAll('.city')].find(e=>e.dataset.value===city)),b=nodePoint([...field.querySelectorAll('.country')].find(e=>e.dataset.value===country)),line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);line.setAttribute('class','match-line');line.style.stroke=color||INK;line.dataset.city=city;line.dataset.country=country;line.addEventListener('pointerdown',e=>{if(phase!=='match')return;e.preventDefault();e.stopPropagation();matchState.cutting={city,country,moved:false};field.setPointerCapture?.(e.pointerId)});svg.appendChild(line)}
-function matchResultColor(){return INK}
-function submitMatch(){phase='matchResult';field.classList.add('frozen');const correct=matchState.cities.filter(c=>{const con=matchState.connections.get(c.City);return con&&con.country===c.Country}).length;const score=MATCH_SCORE[correct]??0;scores.push(score);roundRecords.push({kind:'match',score,correct,total:7,label:'Matching'});const svg=$('#matchSvg');svg.innerHTML='';for(const con of matchState.connections.values()){const ok=current.cities.some(c=>c.City===con.city&&c.Country===con.country);drawMatchLine(svg,con.city,con.country,ok?'#2E6B45':'#A23A30')}const ban=document.createElement('div');ban.className='resultBanner match-result-banner';ban.innerHTML=`<div class="rb-row"><span class="rb-main"><span class="node"></span>You got ${correct}/7 Answers Correct.</span><span class="num">${score}/100</span></div><div class="rb-row"><span class="lbl">Correct pairs</span><span class="num">${correct} / 7</span></div>`;field.appendChild(ban);setStatus(`Scored / ${pad(score,3)}`,true);$('#actionBtn').textContent='Continue';$('#actionBtn').disabled=false;updateRibbon()}
+/* ================= PHYSICS ================= */
+const G=.55;
+function step(dt){
+ for(const b of bricks){if(drag&&drag.b===b)continue;
+  b.vy=Math.min(20,b.vy+G*dt);b.vx*=Math.pow(.985,dt);b.x+=b.vx*dt;b.y+=b.vy*dt;
+  if(b.x<0){b.x=0;b.vx=-b.vx*.2}if(b.x+b.w>W){b.x=W-b.w;b.vx=-b.vx*.2}
+  if(b.y<0){b.y=0;b.vy=0}if(b.y+b.h>=H){b.y=H-b.h;b.vy=0;b.vx*=.8}}
+ for(let pass=0;pass<6;pass++){
+  const s=bricks.slice().sort((a,b)=>b.y-a.y);
+  for(let i=0;i<s.length;i++)for(let j=i+1;j<s.length;j++)collide(s[i],s[j]);
+  for(const b of bricks){b.x=Math.max(0,Math.min(W-b.w,b.x));if(b.y+b.h>H){b.y=H-b.h;b.vy=0}if(b.y<0)b.y=0}
+ }
+}
+function collide(a,b){
+ if(!(a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y))return;
+ const ox=Math.min(a.x+a.w-b.x,b.x+b.w-a.x),oy=Math.min(a.y+a.h-b.y,b.y+b.h-a.y);
+ const dA=drag&&drag.b===a,dB=drag&&drag.b===b;
+ if(oy<=ox){
+  const up=a.y<b.y?a:b,lo=up===a?b:a,upD=up===a?dA:dB;
+  if(upD){lo.y+=oy;lo.vy=Math.max(lo.vy,0)}
+  else{up.y-=oy;if(up.vy>0)up.vy=0;up.vx*=.86;
+   const cx=up.x+up.w/2;
+   if(cx<lo.x)up.vx-=.7;else if(cx>lo.x+lo.w)up.vx+=.7;}
+ }else{
+  const dir=(a.x+a.w/2<b.x+b.w/2)?-1:1;
+  if(dA&&!dB){b.x-=dir*ox;b.vx=-dir*1.5}else if(dB&&!dA){a.x+=dir*ox;a.vx=dir*1.5}
+  else{a.x+=dir*ox/2;b.x-=dir*ox/2;a.vx*=.3;b.vx*=.3}
+ }
+}
+function towerOK(){
+ if(drag||bricks.length!==5)return false;
+ const o=bricks.slice().sort((a,b)=>b.y-a.y);
+ if(Math.abs(o[0].y+o[0].h-H)>2.5)return false;
+ for(let i=0;i<4;i++){const lo=o[i],up=o[i+1],gap=lo.y-(up.y+up.h),cx=up.x+up.w/2;
+  if(Math.abs(gap)>3||cx<lo.x||cx>lo.x+lo.w)return false}
+ return o.every(b=>Math.abs(b.vx)<.3&&Math.abs(b.vy)<.8);
+}
+function loop(t){
+ const dt=Math.min(2,(t-lastT)/16.67||1);lastT=t;
+ if(phase==='play'){
+  step(dt/2);step(dt/2);bricks.forEach(render);
+  stableFrames=towerOK()?stableFrames+1:0;
+  const nowReady=stableFrames>10;
+  if(nowReady!==ready){ready=nowReady;$('#actionBtn').disabled=!ready;setStatus(ready?'Stack verified':'Awaiting stack',ready)}
+ }
+ if(phase!=='idle'&&!$('#gameScreen').classList.contains('hidden'))drawFx();
+ requestAnimationFrame(loop);
+}
 
-/* ---------- ESTIMATION ---------- */
-function loadEstimate(){phase='estimate';const rnd=dailyRnd('estimate'),city=pickEstimate(rnd);current={type:'estimate',city};$('#qCode').innerHTML='<span class="lbl">Ref</span>Q / 05 — EST';$('#qMetric').innerHTML='<span class="lbl">Metric</span>ESTIMATION';$('#modeTag').innerHTML=`<span class="lbl">Mode</span>${gameMode==='daily'?'DAILY':'INFINITE'}`;$('#question').innerHTML=`Estimate the characteristics of <strong>${esc(city.City)}, ${esc(city.Country)}</strong><small>Drag each scale · then place the latitude ring on the globe</small>`;$('#topOrient').innerHTML='';$('#bottomOrient').innerHTML='';$('#ruleTxt').textContent='5 estimates / 100 pts';setStatus('Set all estimates',false);field.classList.add('estimate-mode');renderEstimate(city);updateRibbon()}
-function niceStep(max,type){if(type==='year')return 100;if(type==='elev')return 100;if(type==='pop')return max>20000000?1000000:max>5000000?500000:100000;if(type==='gdp')return max>1e9?100000000:max>100000000?10000000:1000000;return 1}
-function rangeFor(type){const vals=DATA.map(c=>+c[type==='year'?'Year Founded':type==='pop'?'Population':type==='elev'?'Elevation':'GDP']).filter(Number.isFinite);let min=Math.min(...vals),max=Math.max(...vals),step=niceStep(max,type);if(type==='year'){min=Math.floor(min/100)*100;max=Math.ceil(max/100)*100}else if(type==='elev'){min=0;max=Math.ceil(max/1000)*1000;step=100}else if(type==='pop'){min=0;max=Math.ceil(max/100000)*100000}else if(type==='gdp'){min=0;max=Math.ceil(max/100000000)*100000000}return {min,max,step}}
-function gdpSliderValue(v,r){if(v<=0)return 0;return Math.round(Math.log1p(v)/Math.log1p(r.max)*1000)}
-function gdpFromSlider(x,r){return Math.round((Math.expm1(x/1000*Math.log1p(r.max)))/r.step)*r.step}
-function fmtEstimate(type,v){if(type==='pop')return `${(v>=1e6?(v/1e6).toFixed(v%1e6?1:0)+'M':Math.round(v/1e3)+'K')}`;if(type==='year')return v<0?`${Math.abs(Math.round(v))} BCE`:Math.round(v);if(type==='elev')return `${Math.round(v).toLocaleString()} ft`;if(type==='gdp'){if(v>=1e9)return `$${(v/1e9).toFixed(v%1e9?1:0)}B`;if(v>=1e6)return `$${(v/1e6).toFixed(v%1e6?1:0)}M`;return `$${Math.round(v/1e3)}K`}}
-function renderEstimate(city){special.classList.remove('hidden');const defs=[['pop','Population'],['year','Year Established'],['elev','Elevation'],['gdp','GDP']];special.innerHTML=`<div class="estimate-grid"><div class="estimate-panel" id="estimateControls"></div><div class="globe-panel"><div class="globe-title lbl">Latitude / locate on sphere</div><div class="globe" id="globe"><div class="globe-ring" id="globeRing"></div><div class="globe-axis"></div><div class="globe-equator"></div></div><div class="globe-scale"><span>90° N</span><span>0°</span><span>90° S</span></div><input id="latSlider" class="vertical-range" type="range" min="-90" max="90" step="0.1" value="0" aria-label="Latitude"></div></div>`;const controls=$('#estimateControls');estimateState={values:{},ranges:{}};defs.forEach(([type,label])=>{const r=rangeFor(type);estimateState.ranges[type]=r;const row=document.createElement('div');row.className='estimate-row';const initial=type==='gdp'?gdpFromSlider(500,r):Math.round((r.min+r.max)/2/r.step)*r.step;const sliderMin=type==='gdp'?0:r.min,sliderMax=type==='gdp'?1000:r.max,sliderStep=type==='gdp'?1:r.step,sliderValue=type==='gdp'?gdpSliderValue(initial,r):initial;row.innerHTML=`<div class="estimate-label"><span class="lbl">${label}</span><span class="estimate-value num" id="val-${type}">${fmtEstimate(type,initial)}</span></div><input type="range" min="${sliderMin}" max="${sliderMax}" step="${sliderStep}" value="${sliderValue}" data-est="${type}">`;controls.appendChild(row)});controls.querySelectorAll('input[type=range]').forEach(input=>{input.addEventListener('input',()=>{const type=input.dataset.est,val=type==='gdp'?gdpFromSlider(+input.value,estimateState.ranges.gdp):+input.value;estimateState.values[type]=val;$('#val-'+type).textContent=fmtEstimate(type,val);setEstimateReady()})});const lat=$('#latSlider');lat.addEventListener('input',()=>{estimateState.values.lat=+lat.value;updateGlobe(+lat.value);setEstimateReady()});estimateState.values={pop:+controls.querySelector('[data-est="pop"]').value,year:+controls.querySelector('[data-est="year"]').value,elev:+controls.querySelector('[data-est="elev"]').value,gdp:gdpFromSlider(+controls.querySelector('[data-est="gdp"]').value,estimateState.ranges.gdp),lat:0};updateGlobe(0);setEstimateReady()}
-function updateGlobe(lat){const ring=$('#globeRing');if(!ring)return;const y=50-(lat/90)*50,rx=Math.max(3,50*Math.cos(Math.abs(lat)*Math.PI/180));ring.style.top=y+'%';ring.style.width=(rx*2)+'%';ring.style.left=(50-rx)+'%'}
-function setEstimateReady(){const ready=estimateState&&Object.keys(estimateState.values).length===5;$('#actionBtn').disabled=!ready;setStatus(ready?'Ready to submit':'Set all estimates',ready)}
-function scoreEstimate(correct,guess,min,max){const span=max-min;const longer=Math.max(correct-min,max-correct);if(longer<=0)return 20;const bands=Math.max(1,longer/10);const dist=Math.abs(guess-correct);return Math.max(0,20-Math.ceil(dist/bands)*2)}
-function submitEstimate(){phase='estimateResult';field.classList.add('frozen');const c=current.city,v=estimateState.values,r=estimateState.ranges;const parts=[['Population',v.pop,c.Population,r.pop.min,r.pop.max,'pop'],['Year Established',v.year,c['Year Founded'],r.year.min,r.year.max,'year'],['Elevation',v.elev,c.Elevation,r.elev.min,r.elev.max,'elev'],['GDP',v.gdp,c.GDP,r.gdp.min,r.gdp.max,'gdp'],['Latitude',v.lat,c.Latitude,-90,90,'lat']];const raw=parts.map(p=>scoreEstimate(p[2],p[1],p[3],p[4]));const rawTotal=raw.reduce((a,b)=>a+b,0),total=Math.min(100,Math.ceil(rawTotal/10)*10);scores.push(total);roundRecords.push({kind:'estimate',score:total,correct:rawTotal,total:100,label:'Estimation'});parts.forEach((p,i)=>{const el=special.querySelector(i<4?`[data-est="${p[5]}"]`:'#latSlider');if(el){el.disabled=true;el.classList.add('graded-range')}});const panel=document.createElement('div');panel.className='estimate-score-panel';panel.innerHTML=`<span class="lbl">Round score</span><strong>${total}/100</strong><span class="lbl">${esc(c.City)}, ${esc(c.Country)}</span>`;special.appendChild(panel);const bands=document.createElement('div');bands.className='estimate-bands';bands.innerHTML=parts.map((p,i)=>`<div class="estimate-band-row"><span class="lbl">${esc(p[0])}</span><div class="band-scale"><span>20</span><div class="band-gradient"></div><span>0</span></div><span class="num">${raw[i]}/20</span></div>`).join('');special.appendChild(bands);setStatus(`Scored / ${pad(total,3)}`,true);$('#actionBtn').textContent='Continue';$('#actionBtn').disabled=false;updateRibbon()}
+/* ================= SUBMIT / RESULT ================= */
+function onAction(){
+ if(phase==='result'){round++;if(round>=5)endGame();else loadRound();return}
+ if(phase!=='play'||!ready||!towerOK())return;
+ phase='result';field.classList.add('frozen');endDrag();
+ const q=current.q,key=q.key;
+ const tower=bricks.slice().sort((a,b)=>b.y-a.y);                // bottom → top
+ const {pairs,score,wrong}=pairwiseScore(tower.map(b=>+b.city[key]));
+ const correct=current.cities.slice().sort((a,b)=>a[key]-b[key]); // bottom → top
+ scores.push(score);pairsList.push(pairs);
+ tower.forEach((b,i)=>{
+  b.wrong=wrong[i];b.col=gradFg(wrong[i]);
+  b.el.classList.add('graded');
+  b.el.style.setProperty('--c',b.col);b.el.style.setProperty('--cb',gradBg(wrong[i]));
+  b.el.querySelector('.b-val').textContent=q.fmt(+b.city[key]);
+ });
+ // lay out: user tower left, reference tower right, identical geometry
+ const minX=Math.min(...tower.map(b=>b.x)),maxX=Math.max(...tower.map(b=>b.x+b.w)),S=maxX-minX;
+ let gap=Math.max(20,Math.min(170,W-2*S-40));if(2*S+gap>W-8)gap=Math.max(6,W-8-2*S);
+ const left=Math.max(4,(W-(2*S+gap))/2),dx=left-minX,off=S+gap;
+ tower.forEach(b=>{b.x+=dx;render(b)});
+ refs=tower.map((b,i)=>{const el=document.createElement('div');el.className='brick ref';el.style.width=b.w+'px';el.style.height=b.h+'px';
+  el.innerHTML=`<span class="b-label">${esc(correct[i].City)}, ${esc(correct[i].Country)}</span><span class="b-val">${esc(q.fmt(+correct[i][key]))}</span>`;
+  field.appendChild(el);const r={el,x:b.x+off,y:b.y,w:b.w,h:b.h};render(r);return r});
+ links=tower.map(b=>{const r=refs[correct.indexOf(b.city)];return{x1:b.x+b.w,y1:b.y+b.h/2,x2:r.x,y2:r.y+r.h/2,c:b.col}});
+ const topY=Math.min(...tower.map(b=>b.y));
+ caption(`<span class="node hollow"></span>Submitted / your tower`,left,topY-20);
+ caption(`<span class="node"></span>Reference / correct order`,left+off,topY-20);
+ const legend=[0,1,2,3,4].map(w=>`<i style="border-color:${gradFg(w)};background:${gradBg(w)}"></i>`).join('');
+ const ban=document.createElement('div');ban.className='resultBanner';
+ ban.innerHTML=`<div class="rb-row"><span class="rb-main"><span class="node"></span>Score: ${score}/100, you got ${pairs}/10 comparisons correct.</span></div>
+  <div class="rb-row"><span class="lbl">Pairs correct</span>${pairsStrip(pairs)}<span class="num">${pad(pairs)}/10</span></div>
+  <div class="rb-row"><span class="lbl">Inverted pairs / brick</span><span class="legend"><span class="lbl">0</span>${legend}<span class="lbl">4</span></span></div>`;
+ field.appendChild(ban);
+ setStatus(`Scored / ${pad(score,3)}`,true);
+ const btn=$('#actionBtn');btn.textContent='Continue';btn.disabled=false;
+ updateRibbon();
+}
+function caption(html,x,y){const c=document.createElement('div');c.className='caption';c.innerHTML=html;c.style.left=Math.max(4,Math.min(W-200,x))+'px';c.style.top=Math.max(4,y)+'px';field.appendChild(c)}
 
-/* ---------- ACTION / RESULTS ---------- */
-function onAction(){if(phase==='rank'&&ready){showRankResult();return}if(phase==='match'){submitMatch();return}if(phase==='estimate'&&estimateState){submitEstimate();return}if(phase==='rankResult'||phase==='matchResult'||phase==='estimateResult'){round++;if(round>=5){endGame()}else loadRound()}}
-function caption(html,x,y){const c=document.createElement('div');c.className='caption';c.innerHTML=html;c.style.left=Math.max(4,Math.min(W-210,x))+'px';c.style.top=Math.max(4,y)+'px';field.appendChild(c)}
-function endGame(){phase='idle';show('#endScreen');$('#seqTxt').textContent='05/05';$('#endMode').innerHTML=`<span class="lbl">Mode</span>${gameMode==='daily'?'DAILY':'INFINITE'}`;$('#endDate').textContent=isoDate;$('#ledgerBody').innerHTML=roundRecords.map((r,i)=>`<tr><td class="num">[${pad(i+1)}]</td><td>${r.label.toUpperCase()}</td><td class="hide-sm">${r.kind==='rank'?`${r.correct}/${r.total}`:r.kind==='match'?`${r.correct}/7`:'5 estimates'}</td><td class="r num">${r.score}/100</td></tr>`).join('');$('#totalVal').textContent=scores.reduce((a,b)=>a+b,0);$('#copied').textContent='';updateRibbon()}
-function scoreText(){const d=today.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),total=scores.reduce((a,b)=>a+b,0);return gameMode==='daily'?`Daily City Stack - ${d}:\n${scores.map((s,i)=>`${i+1}. ${s}/100`).join('\n')}\nTOTAL: ${total}`:`City Stack - Infinite Mode:\n${scores.map((s,i)=>`${i+1}. ${s}/100`).join('\n')}\nTOTAL: ${total}`}
-async function copyScore(){const t=scoreText();try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}$('#copied').textContent='■ COPIED TO CLIPBOARD'}
+/* ================= END ================= */
+function endGame(){
+ phase='idle';show('#endScreen');updateRibbon();
+ $('#seqTxt').textContent='05/05';
+ $('#endMode').innerHTML=`<span class="lbl">Mode</span>${gameMode==='daily'?'DAILY':'INFINITE'}`;
+ $('#endDate').textContent=isoDate;
+ $('#ledgerBody').innerHTML=scores.map((s,i)=>`<tr><td class="num">[${pad(i+1)}]</td><td>${order[i].id} / ${order[i].name.toUpperCase()}</td>
+  <td class="hide-sm">${pairsStrip(pairsList[i])}</td>
+  <td class="r num">${s}/100</td></tr>`).join('');
+ $('#totalVal').textContent=scores.reduce((a,b)=>a+b,0);
+ $('#copied').textContent='';
+}
+function scoreText(){
+ const d=today.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+ const lines=scores.map((s,i)=>`${i+1}. ${squareLine(pairsList[i])}`).join('\n');
+ const total=scores.reduce((a,b)=>a+b,0);
+ return gameMode==='daily'
+  ? `Daily City Stack - ${d}:\n${lines}\nTOTAL: ${total}`
+  : `City Stack - Infinite Mode:\n${lines}\nTOTAL: ${total}`;
+}
+async function copyScore(){
+ const t=scoreText();
+ try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
+ $('#copied').textContent='■ COPIED TO CLIPBOARD';
+}
 
-function loop(t){const dt=Math.min(2,(t-lastT)/16.67||1);lastT=t;if(phase==='rank'){step(dt/2);step(dt/2);bricks.forEach(render);const ok=towerOK();stableFrames=ok?stableFrames+1:0;const nr=stableFrames>10;if(nr!==ready){ready=nr;$('#actionBtn').disabled=!ready;setStatus(ready?'Stack verified':'Awaiting stack',ready)}}if(phase==='match')updateMatchSvg();drawFx();requestAnimationFrame(loop)}
-
-$('#dailyBtn').onclick=()=>startGame('daily');$('#infiniteBtn').onclick=()=>startGame('infinite');$('#actionBtn').onclick=onAction;$('#copyBtn').onclick=copyScore;$('#restartBtn').onclick=()=>{scores=[];roundRecords=[];round=0;phase='idle';show('#startScreen');updateRibbon();drawStart()};
-window.addEventListener('resize',()=>{if(!$('#startScreen').classList.contains('hidden'))drawStart();if(!$('#gameScreen').classList.contains('hidden')){sizeField();if(phase==='rank'){const bw=brickW(),bh=brickH();bricks.forEach(b=>{b.w=bw;b.h=bh;b.el.style.width=bw+'px';b.el.style.height=bh+'px';b.x=Math.min(b.x,W-bw);b.y=Math.min(b.y,H-b.h)})}if(phase==='match')requestAnimationFrame(updateMatchGeometry);if(phase==='estimate'&&current)requestAnimationFrame(()=>updateGlobe(estimateState.values.lat||0))}});
-updateRibbon();drawStart();requestAnimationFrame(loop);if(document.fonts)document.fonts.ready.then(drawStart);
+/* ================= WIRING ================= */
+$('#dailyBtn').onclick=()=>startGame('daily');
+$('#infiniteBtn').onclick=()=>startGame('infinite');
+$('#actionBtn').onclick=onAction;$('#copyBtn').onclick=copyScore;
+$('#restartBtn').onclick=()=>{scores=[];pairsList=[];round=0;phase='idle';show('#startScreen');updateRibbon();drawStart()};
+window.addEventListener('resize',()=>{
+ if(!$('#startScreen').classList.contains('hidden'))drawStart();
+ if(phase==='play'){sizeField();const bw=brickW(),bh=brickH();bricks.forEach(b=>{b.w=bw;b.h=bh;b.el.style.width=bw+'px';b.el.style.height=bh+'px';b.x=Math.min(b.x,W-bw);b.y=Math.min(b.y,H-b.h)})}
+});
+updateRibbon();drawStart();requestAnimationFrame(loop);
+if(document.fonts)document.fonts.ready.then(drawStart);
