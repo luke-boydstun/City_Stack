@@ -1,6 +1,2757 @@
 'use strict';
 /* ================= DATA ================= */
-const RAW_CITIES = [{"City": "Herat", "Country": "Afghanistan", "Latitude": 23.6182, "Longitude": -92.4731, "Population": 2738733, "Elevation": 308, "Year Founded": 1733, "GDP": 77867270072, "GDP per capita": 31908}, {"City": "Kabul", "Country": "Afghanistan", "Latitude": 34.5553, "Longitude": 69.2075, "Population": 4600000, "Elevation": 1790, "Year Founded": 1776, "GDP": 8000000, "GDP per capita": 2000}, {"City": "Algiers", "Country": "Algeria", "Latitude": 36.7538, "Longitude": 3.0588, "Population": 3500000, "Elevation": 25, "Year Founded": 944, "GDP": 55000000, "GDP per capita": 16000}, {"City": "Andorra la Vella", "Country": "Andorra", "Latitude": 42.5063, "Longitude": 1.5218, "Population": 23000, "Elevation": 1023, "Year Founded": 1278, "GDP": 1500000.0, "GDP per capita": 65000}, {"City": "Benguela", "Country": "Angola", "Latitude": 34.7208, "Longitude": 92.9782, "Population": 2957200, "Elevation": 177, "Year Founded": 1711, "GDP": 152668755634, "GDP per capita": 72356}, {"City": "Luanda", "Country": "Angola", "Latitude": -8.839, "Longitude": 13.2894, "Population": 9000000, "Elevation": 6, "Year Founded": 1576, "GDP": 45000000, "GDP per capita": 5000}, {"City": "Buenos Aires", "Country": "Argentina", "Latitude": -34.6037, "Longitude": -58.3816, "Population": 3100000, "Elevation": 25, "Year Founded": 1536, "GDP": 220000000, "GDP per capita": 71000}, {"City": "Mendoza", "Country": "Argentina", "Latitude": -32.8895, "Longitude": -68.8458, "Population": 115000, "Elevation": 746, "Year Founded": 1561, "GDP": 10000000, "GDP per capita": 87000}, {"City": "Ushuaia", "Country": "Argentina", "Latitude": -54.8019, "Longitude": -68.303, "Population": 80000, "Elevation": 23, "Year Founded": 1884, "GDP": 4000000, "GDP per capita": 50000}, {"City": "Yerevan", "Country": "Armenia", "Latitude": 40.1872, "Longitude": 44.5152, "Population": 1090000, "Elevation": 990, "Year Founded": 782, "GDP": 20000000, "GDP per capita": 18000}, {"City": "Adelaide", "Country": "Australia", "Latitude": -34.9285, "Longitude": 138.6007, "Population": 1400000, "Elevation": 50, "Year Founded": 1836, "GDP": 90000000, "GDP per capita": 64000}, {"City": "Brisbane", "Country": "Australia", "Latitude": -27.4698, "Longitude": 153.0251, "Population": 2600000, "Elevation": 32, "Year Founded": 1825, "GDP": 170000000, "GDP per capita": 65000}, {"City": "Cairns", "Country": "Australia", "Latitude": 38.5302, "Longitude": -20.8762, "Population": 2961789, "Elevation": 367, "Year Founded": 1741, "GDP": 124023405092, "GDP per capita": 41550}, {"City": "Canberra", "Country": "Australia", "Latitude": -35.2809, "Longitude": 149.13, "Population": 470000, "Elevation": 578, "Year Founded": 1913, "GDP": 35000000, "GDP per capita": 74000}, {"City": "Melbourne", "Country": "Australia", "Latitude": -37.8136, "Longitude": 144.9631, "Population": 5200000, "Elevation": 31, "Year Founded": 1835, "GDP": 430000000, "GDP per capita": 83000}, {"City": "Perth", "Country": "Australia", "Latitude": -31.9505, "Longitude": 115.8605, "Population": 2100000, "Elevation": 31, "Year Founded": 1829, "GDP": 150000000, "GDP per capita": 71000}, {"City": "Sydney", "Country": "Australia", "Latitude": -33.8688, "Longitude": 151.2093, "Population": 5312000, "Elevation": 3, "Year Founded": 1788, "GDP": 480000000, "GDP per capita": 90000}, {"City": "Vienna", "Country": "Austria", "Latitude": 48.2082, "Longitude": 16.3738, "Population": 2020000, "Elevation": 171, "Year Founded": 1192, "GDP": 160000000, "GDP per capita": 79000}, {"City": "Baku", "Country": "Azerbaijan", "Latitude": 40.4093, "Longitude": 49.8671, "Population": 2300000, "Elevation": -28, "Year Founded": 5, "GDP": 80000000, "GDP per capita": 35000}, {"City": "Chittagong", "Country": "Bangladesh", "Latitude": 22.3569, "Longitude": 91.7832, "Population": 5000000, "Elevation": 6, "Year Founded": 1666, "GDP": 35000000, "GDP per capita": 7000}, {"City": "Dhaka", "Country": "Bangladesh", "Latitude": 23.8103, "Longitude": 90.4125, "Population": 10000000, "Elevation": 4, "Year Founded": 1608, "GDP": 140000000, "GDP per capita": 14000}, {"City": "Brussels", "Country": "Belgium", "Latitude": 50.8503, "Longitude": 4.3517, "Population": 1220000, "Elevation": 13, "Year Founded": 979, "GDP": 180000000, "GDP per capita": 148000}, {"City": "La Paz", "Country": "Bolivia", "Latitude": -16.4897, "Longitude": -68.1193, "Population": 780000, "Elevation": 3640, "Year Founded": 1548, "GDP": 25000000, "GDP per capita": 32000}, {"City": "Santa Cruz de la Sierra", "Country": "Bolivia", "Latitude": -2.3252, "Longitude": 159.5413, "Population": 2937600, "Elevation": 72, "Year Founded": 846, "GDP": 90593678211, "GDP per capita": 35819}, {"City": "Sarajevo", "Country": "Bosnia and Herzegovina", "Latitude": 43.8563, "Longitude": 18.4131, "Population": 275000, "Elevation": 518, "Year Founded": 1461, "GDP": 8000000, "GDP per capita": 29000}, {"City": "Gaborone", "Country": "Botswana", "Latitude": -24.6282, "Longitude": 25.9231, "Population": 250000, "Elevation": 1000, "Year Founded": 1884, "GDP": 8000000, "GDP per capita": 32000}, {"City": "Brasília", "Country": "Brazil", "Latitude": -15.7975, "Longitude": -47.8919, "Population": 3100000, "Elevation": 1172, "Year Founded": 1960, "GDP": 140000000, "GDP per capita": 45000}, {"City": "Foz do Iguaçu", "Country": "Brazil", "Latitude": -25.5163, "Longitude": -54.5854, "Population": 260000, "Elevation": 173, "Year Founded": 1914, "GDP": 7000000, "GDP per capita": 27000}, {"City": "Rio de Janeiro", "Country": "Brazil", "Latitude": -22.9068, "Longitude": -43.1729, "Population": 6700000, "Elevation": 2, "Year Founded": 1565, "GDP": 330000000, "GDP per capita": 49000}, {"City": "Salvador", "Country": "Brazil", "Latitude": -12.9777, "Longitude": -38.5016, "Population": 2900000, "Elevation": 8, "Year Founded": 1549, "GDP": 55000000, "GDP per capita": 19000}, {"City": "São Paulo", "Country": "Brazil", "Latitude": -23.5505, "Longitude": -46.6333, "Population": 11897000, "Elevation": 760, "Year Founded": 1554, "GDP": 430000000, "GDP per capita": 36000}, {"City": "Sofia", "Country": "Bulgaria", "Latitude": 42.6977, "Longitude": 23.3219, "Population": 1280000, "Elevation": 550, "Year Founded": 809, "GDP": 30000000, "GDP per capita": 23000}, {"City": "Phnom Penh", "Country": "Cambodia", "Latitude": 11.5564, "Longitude": 104.9282, "Population": 2300000, "Elevation": 23, "Year Founded": 1434, "GDP": 25000000, "GDP per capita": 11000}, {"City": "Siem Reap", "Country": "Cambodia", "Latitude": 62.2508, "Longitude": 89.1617, "Population": 2268911, "Elevation": 330, "Year Founded": 1104, "GDP": 25629260396, "GDP per capita": 15781}, {"City": "Calgary", "Country": "Canada", "Latitude": 51.0447, "Longitude": -114.0719, "Population": 1350000, "Elevation": 1045, "Year Founded": 1875, "GDP": 125000000, "GDP per capita": 93000}, {"City": "London", "Country": "Canada", "Latitude": 22.9427, "Longitude": 81.5588, "Population": 2790526, "Elevation": 509, "Year Founded": 1484, "GDP": 84127940001, "GDP per capita": 26404}, {"City": "Montreal", "Country": "Canada", "Latitude": 45.5019, "Longitude": -73.5674, "Population": 1800000, "Elevation": 36, "Year Founded": 1642, "GDP": 200000000, "GDP per capita": 111000}, {"City": "Ottawa", "Country": "Canada", "Latitude": 45.4215, "Longitude": -75.6972, "Population": 1100000, "Elevation": 70, "Year Founded": 1826, "GDP": 75000000, "GDP per capita": 68000}, {"City": "Quebec City", "Country": "Canada", "Latitude": 46.8139, "Longitude": -71.208, "Population": 550000, "Elevation": 98, "Year Founded": 1608, "GDP": 40000000, "GDP per capita": 73000}, {"City": "Toronto", "Country": "Canada", "Latitude": 43.6532, "Longitude": -79.3832, "Population": 3020000, "Elevation": 76, "Year Founded": 1793, "GDP": 420000000, "GDP per capita": 139000}, {"City": "Vancouver", "Country": "Canada", "Latitude": 49.2827, "Longitude": -123.1207, "Population": 675000, "Elevation": 2, "Year Founded": 1886, "GDP": 145000000, "GDP per capita": 215000}, {"City": "Santiago", "Country": "Chile", "Latitude": -33.4489, "Longitude": -70.6693, "Population": 6200000, "Elevation": 520, "Year Founded": 1541, "GDP": 200000000, "GDP per capita": 32000}, {"City": "Valparaíso", "Country": "Chile", "Latitude": -33.0472, "Longitude": -71.6127, "Population": 300000, "Elevation": 10, "Year Founded": 1536, "GDP": 25000000, "GDP per capita": 83000}, {"City": "Beijing", "Country": "China", "Latitude": 39.9042, "Longitude": 116.4074, "Population": 21800000, "Elevation": 44, "Year Founded": 1045, "GDP": 700000000, "GDP per capita": 32000}, {"City": "Chengdu", "Country": "China", "Latitude": 30.5728, "Longitude": 104.0668, "Population": 21000000, "Elevation": 500, "Year Founded": 311, "GDP": 450000000, "GDP per capita": 21000}, {"City": "Chongqing", "Country": "China", "Latitude": 29.563, "Longitude": 106.5516, "Population": 32000000, "Elevation": 259, "Year Founded": 1189, "GDP": 430000000, "GDP per capita": 13000}, {"City": "Guangzhou", "Country": "China", "Latitude": 23.1291, "Longitude": 113.2644, "Population": 15000000, "Elevation": 21, "Year Founded": 2143, "GDP": 480000000, "GDP per capita": 32000}, {"City": "Hangzhou", "Country": "China", "Latitude": 30.2741, "Longitude": 120.1551, "Population": 12000000, "Elevation": 19, "Year Founded": 589, "GDP": 350000000, "GDP per capita": 29000}, {"City": "Harbin", "Country": "China", "Latitude": 45.8038, "Longitude": 126.5349, "Population": 5300000, "Elevation": 150, "Year Founded": 1898, "GDP": 90000000, "GDP per capita": 17000}, {"City": "Kunming", "Country": "China", "Latitude": 25.0389, "Longitude": 102.7183, "Population": 8500000, "Elevation": 1890, "Year Founded": 765, "GDP": 110000000, "GDP per capita": 13000}, {"City": "Nanjing", "Country": "China", "Latitude": 32.0603, "Longitude": 118.7969, "Population": 9500000, "Elevation": 15, "Year Founded": 495, "GDP": 250000000, "GDP per capita": 26000}, {"City": "Qingdao", "Country": "China", "Latitude": 36.0671, "Longitude": 120.3826, "Population": 10000000, "Elevation": 25, "Year Founded": 1891, "GDP": 180000000, "GDP per capita": 18000}, {"City": "Shanghai", "Country": "China", "Latitude": 31.2304, "Longitude": 121.4737, "Population": 24800000, "Elevation": 4, "Year Founded": 1291, "GDP": 1100000000, "GDP per capita": 44000}, {"City": "Shenzhen", "Country": "China", "Latitude": 22.5431, "Longitude": 114.0579, "Population": 17600000, "Elevation": 6, "Year Founded": 1979, "GDP": 550000000, "GDP per capita": 31000}, {"City": "Wuhan", "Country": "China", "Latitude": 30.5928, "Longitude": 114.3055, "Population": 13000000, "Elevation": 23, "Year Founded": 192, "GDP": 250000000, "GDP per capita": 19000}, {"City": "Xi'an", "Country": "China", "Latitude": 34.3416, "Longitude": 108.9398, "Population": 13000000, "Elevation": 405, "Year Founded": 1000, "GDP": 250000000, "GDP per capita": 19000}, {"City": "Bogotá", "Country": "Colombia", "Latitude": 4.711, "Longitude": -74.0721, "Population": 7900000, "Elevation": 2640, "Year Founded": 1538, "GDP": 140000000, "GDP per capita": 18000}, {"City": "Cartagena", "Country": "Colombia", "Latitude": 10.391, "Longitude": -75.4794, "Population": 1100000, "Elevation": 2, "Year Founded": 1533, "GDP": 20000000, "GDP per capita": 18000}, {"City": "Medellín", "Country": "Colombia", "Latitude": 6.2442, "Longitude": -75.5812, "Population": 2600000, "Elevation": 1495, "Year Founded": 1616, "GDP": 45000000, "GDP per capita": 17000}, {"City": "San José", "Country": "Costa Rica", "Latitude": 9.9281, "Longitude": -84.0907, "Population": 350000, "Elevation": 1172, "Year Founded": 1738, "GDP": 25000000, "GDP per capita": 71000}, {"City": "Dubrovnik", "Country": "Croatia", "Latitude": 42.6507, "Longitude": 18.0944, "Population": 42000, "Elevation": 3, "Year Founded": 639, "GDP": 5000000, "GDP per capita": 119000}, {"City": "Zagreb", "Country": "Croatia", "Latitude": 45.815, "Longitude": 15.9819, "Population": 770000, "Elevation": 158, "Year Founded": 1094, "GDP": 35000000, "GDP per capita": 45000}, {"City": "Havana", "Country": "Cuba", "Latitude": 23.1136, "Longitude": -82.3666, "Population": 2100000, "Elevation": 59, "Year Founded": 1519, "GDP": 30000000, "GDP per capita": 14000}, {"City": "Prague", "Country": "Czech Republic", "Latitude": 50.0755, "Longitude": 14.4378, "Population": 1390000, "Elevation": 235, "Year Founded": 885, "GDP": 120000000, "GDP per capita": 86000}, {"City": "Kinshasa", "Country": "DR Congo", "Latitude": -4.4419, "Longitude": 15.2663, "Population": 17000000, "Elevation": 240, "Year Founded": 1881, "GDP": 25000000, "GDP per capita": 2000}, {"City": "Copenhagen", "Country": "Denmark", "Latitude": 55.6761, "Longitude": 12.5683, "Population": 660000, "Elevation": 14, "Year Founded": 1167, "GDP": 135000000, "GDP per capita": 205000}, {"City": "Santo Domingo", "Country": "Dominican Republic", "Latitude": 18.4861, "Longitude": -69.9312, "Population": 1100000, "Elevation": 14, "Year Founded": 1496, "GDP": 30000000, "GDP per capita": 27000}, {"City": "Guayaquil", "Country": "Ecuador", "Latitude": -2.1709, "Longitude": -79.9224, "Population": 2700000, "Elevation": 4, "Year Founded": 1538, "GDP": 30000000, "GDP per capita": 11000}, {"City": "Manta", "Country": "Ecuador", "Latitude": 47.3933, "Longitude": -32.9689, "Population": 2774982, "Elevation": 318, "Year Founded": 642, "GDP": 217763650592, "GDP per capita": 61253}, {"City": "Quito", "Country": "Ecuador", "Latitude": -0.1807, "Longitude": -78.4678, "Population": 2800000, "Elevation": 2850, "Year Founded": 1534, "GDP": 35000000, "GDP per capita": 13000}, {"City": "Alexandria", "Country": "Egypt", "Latitude": 31.2001, "Longitude": 29.9187, "Population": 5200000, "Elevation": 5, "Year Founded": -331, "GDP": 40000000, "GDP per capita": 8000}, {"City": "Cairo", "Country": "Egypt", "Latitude": 30.0444, "Longitude": 31.2357, "Population": 10230350, "Elevation": 23, "Year Founded": 969, "GDP": 120000000, "GDP per capita": 12000}, {"City": "Giza", "Country": "Egypt", "Latitude": 30.0131, "Longitude": 31.2089, "Population": 4200000, "Elevation": 19, "Year Founded": -2560, "GDP": 45000000, "GDP per capita": 11000}, {"City": "Luxor", "Country": "Egypt", "Latitude": 25.6872, "Longitude": 32.6396, "Population": 500000, "Elevation": 89, "Year Founded": -2160, "GDP": 5000000, "GDP per capita": 10000}, {"City": "Tallinn", "Country": "Estonia", "Latitude": 59.437, "Longitude": 24.7536, "Population": 460000, "Elevation": 9, "Year Founded": 1154, "GDP": 25000000, "GDP per capita": 54000}, {"City": "Addis Ababa", "Country": "Ethiopia", "Latitude": 9.032, "Longitude": 38.7469, "Population": 5200000, "Elevation": 2355, "Year Founded": 1886, "GDP": 35000000, "GDP per capita": 7000}, {"City": "Suva", "Country": "Fiji", "Latitude": -18.1416, "Longitude": 178.4419, "Population": 95000, "Elevation": 5, "Year Founded": 1882, "GDP": 2000000, "GDP per capita": 21000}, {"City": "Helsinki", "Country": "Finland", "Latitude": 60.1699, "Longitude": 24.9384, "Population": 684000, "Elevation": 26, "Year Founded": 1550, "GDP": 110000000, "GDP per capita": 161000}, {"City": "Lyon", "Country": "France", "Latitude": 45.764, "Longitude": 4.8357, "Population": 520000, "Elevation": 173, "Year Founded": 43, "GDP": 75000000, "GDP per capita": 144000}, {"City": "Marseille", "Country": "France", "Latitude": 43.2965, "Longitude": 5.3698, "Population": 870000, "Elevation": 28, "Year Founded": 600, "GDP": 80000000, "GDP per capita": 92000}, {"City": "Nice", "Country": "France", "Latitude": 43.7102, "Longitude": 7.262, "Population": 350000, "Elevation": 10, "Year Founded": 350, "GDP": 45000000, "GDP per capita": 129000}, {"City": "Paris", "Country": "France", "Latitude": 48.8566, "Longitude": 2.3522, "Population": 2102650, "Elevation": 35, "Year Founded": -52, "GDP": 1000000000, "GDP per capita": 475000}, {"City": "Batumi", "Country": "Georgia", "Latitude": 23.3984, "Longitude": -132.0482, "Population": 2945804, "Elevation": 798, "Year Founded": 722, "GDP": 108535835081, "GDP per capita": 39237}, {"City": "Tbilisi", "Country": "Georgia", "Latitude": 41.7151, "Longitude": 44.8271, "Population": 1200000, "Elevation": 491, "Year Founded": 458, "GDP": 30000000, "GDP per capita": 25000}, {"City": "Berlin", "Country": "Germany", "Latitude": 52.52, "Longitude": 13.405, "Population": 3755251, "Elevation": 34, "Year Founded": 1237, "GDP": 180000000, "GDP per capita": 48000}, {"City": "Hamburg", "Country": "Germany", "Latitude": 53.5511, "Longitude": 9.9937, "Population": 1900000, "Elevation": 8, "Year Founded": 808, "GDP": 170000000, "GDP per capita": 89000}, {"City": "Munich", "Country": "Germany", "Latitude": 48.1351, "Longitude": 11.582, "Population": 1600000, "Elevation": 519, "Year Founded": 1158, "GDP": 240000000, "GDP per capita": 150000}, {"City": "Accra", "Country": "Ghana", "Latitude": 5.6037, "Longitude": -0.187, "Population": 2500000, "Elevation": 61, "Year Founded": 1877, "GDP": 35000000, "GDP per capita": 14000}, {"City": "Athens", "Country": "Greece", "Latitude": 37.9838, "Longitude": 23.7275, "Population": 664000, "Elevation": 70, "Year Founded": -508, "GDP": 110000000, "GDP per capita": 166000}, {"City": "Guatemala City", "Country": "Guatemala", "Latitude": 14.6349, "Longitude": -90.5069, "Population": 3000000, "Elevation": 1500, "Year Founded": 1776, "GDP": 55000000, "GDP per capita": 18000}, {"City": "Hong Kong", "Country": "Hong Kong", "Latitude": 22.3193, "Longitude": 114.1694, "Population": 7500000, "Elevation": 35, "Year Founded": 1841, "GDP": 380000000, "GDP per capita": 51000}, {"City": "Budapest", "Country": "Hungary", "Latitude": 47.4979, "Longitude": 19.0402, "Population": 1680000, "Elevation": 102, "Year Founded": 1873, "GDP": 90000000, "GDP per capita": 54000}, {"City": "Reykjavik", "Country": "Iceland", "Latitude": 64.1466, "Longitude": -21.9426, "Population": 140000, "Elevation": 61, "Year Founded": 874, "GDP": 25000000, "GDP per capita": 179000}, {"City": "Agra", "Country": "India", "Latitude": 16.9266, "Longitude": -50.0333, "Population": 717452, "Elevation": 613, "Year Founded": 608, "GDP": 17032193797, "GDP per capita": 18921}, {"City": "Ahmedabad", "Country": "India", "Latitude": 23.0225, "Longitude": 72.5714, "Population": 8000000, "Elevation": 53, "Year Founded": 1411, "GDP": 55000000, "GDP per capita": 7000}, {"City": "Bengaluru", "Country": "India", "Latitude": 12.9716, "Longitude": 77.5946, "Population": 13700000, "Elevation": 920, "Year Founded": 1537, "GDP": 130000000, "GDP per capita": 9000}, {"City": "Chennai", "Country": "India", "Latitude": 13.0827, "Longitude": 80.2707, "Population": 7000000, "Elevation": 6, "Year Founded": 1639, "GDP": 95000000, "GDP per capita": 14000}, {"City": "Delhi", "Country": "India", "Latitude": 28.6139, "Longitude": 77.209, "Population": 32900000, "Elevation": 216, "Year Founded": 1639, "GDP": 293000000, "GDP per capita": 9000}, {"City": "Goa", "Country": "India", "Latitude": -28.2165, "Longitude": 24.8292, "Population": 183086, "Elevation": 553, "Year Founded": 785, "GDP": 12596976346, "GDP per capita": 63766}, {"City": "Hyderabad", "Country": "India", "Latitude": 17.385, "Longitude": 78.4867, "Population": 10500000, "Elevation": 542, "Year Founded": 1591, "GDP": 95000000, "GDP per capita": 9000}, {"City": "Jaipur", "Country": "India", "Latitude": 26.9124, "Longitude": 75.7873, "Population": 3100000, "Elevation": 431, "Year Founded": 1727, "GDP": 30000000, "GDP per capita": 10000}, {"City": "Kolkata", "Country": "India", "Latitude": 22.5726, "Longitude": 88.3639, "Population": 5200000, "Elevation": 9, "Year Founded": 1690, "GDP": 85000000, "GDP per capita": 16000}, {"City": "Mumbai", "Country": "India", "Latitude": 19.076, "Longitude": 72.8777, "Population": 20411000, "Elevation": 14, "Year Founded": 1507, "GDP": 310000000, "GDP per capita": 15000}, {"City": "Pune", "Country": "India", "Latitude": 18.5204, "Longitude": 73.8567, "Population": 7000000, "Elevation": 560, "Year Founded": 937, "GDP": 70000000, "GDP per capita": 10000}, {"City": "Varanasi", "Country": "India", "Latitude": 2.3055, "Longitude": 165.2041, "Population": 2918731, "Elevation": 259, "Year Founded": 1058, "GDP": 96851895331, "GDP per capita": 37190}, {"City": "Bali", "Country": "Indonesia", "Latitude": -8.4095, "Longitude": 115.1889, "Population": 4300000, "Elevation": 500, "Year Founded": 1343, "GDP": 40000000, "GDP per capita": 9000}, {"City": "Jakarta", "Country": "Indonesia", "Latitude": -6.2088, "Longitude": 106.8456, "Population": 11000000, "Elevation": 8, "Year Founded": 1527, "GDP": 300000000, "GDP per capita": 27000}, {"City": "Surabaya", "Country": "Indonesia", "Latitude": -7.2575, "Longitude": 112.7521, "Population": 2900000, "Elevation": 5, "Year Founded": 1293, "GDP": 55000000, "GDP per capita": 19000}, {"City": "Yogyakarta", "Country": "Indonesia", "Latitude": -7.7956, "Longitude": 110.3695, "Population": 430000, "Elevation": 113, "Year Founded": 1755, "GDP": 10000000, "GDP per capita": 23000}, {"City": "Isfahan", "Country": "Iran", "Latitude": 28.8204, "Longitude": -4.9024, "Population": 1699937, "Elevation": 295, "Year Founded": 1425, "GDP": 94918551959, "GDP per capita": 71584}, {"City": "Tehran", "Country": "Iran", "Latitude": 35.6892, "Longitude": 51.389, "Population": 9000000, "Elevation": 1200, "Year Founded": 1789, "GDP": 150000000, "GDP per capita": 17000}, {"City": "Baghdad", "Country": "Iraq", "Latitude": 33.3152, "Longitude": 44.3661, "Population": 8000000, "Elevation": 34, "Year Founded": 762, "GDP": 50000000, "GDP per capita": 6000}, {"City": "Erbil", "Country": "Iraq", "Latitude": -36.1034, "Longitude": -94.1426, "Population": 2893727, "Elevation": 1344, "Year Founded": 775, "GDP": 107042944740, "GDP per capita": 37544}, {"City": "Dublin", "Country": "Ireland", "Latitude": 53.3498, "Longitude": -6.2603, "Population": 592000, "Elevation": 20, "Year Founded": 841, "GDP": 180000000, "GDP per capita": 304000}, {"City": "Jerusalem", "Country": "Israel", "Latitude": 31.7683, "Longitude": 35.2137, "Population": 1000000, "Elevation": 754, "Year Founded": -1000, "GDP": 45000000, "GDP per capita": 45000}, {"City": "Tel Aviv", "Country": "Israel", "Latitude": 32.0853, "Longitude": 34.7818, "Population": 470000, "Elevation": 5, "Year Founded": 1909, "GDP": 60000000, "GDP per capita": 128000}, {"City": "Florence", "Country": "Italy", "Latitude": 43.7696, "Longitude": 11.2558, "Population": 380000, "Elevation": 50, "Year Founded": -59, "GDP": 30000000, "GDP per capita": 79000}, {"City": "Milan", "Country": "Italy", "Latitude": 45.4642, "Longitude": 9.19, "Population": 1370000, "Elevation": 120, "Year Founded": -400, "GDP": 245000000, "GDP per capita": 179000}, {"City": "Naples", "Country": "Italy", "Latitude": 40.8518, "Longitude": 14.2681, "Population": 910000, "Elevation": 17, "Year Founded": -600, "GDP": 65000000, "GDP per capita": 71000}, {"City": "Rome", "Country": "Italy", "Latitude": 41.9028, "Longitude": 12.4964, "Population": 2872800, "Elevation": 21, "Year Founded": -753, "GDP": 240000000, "GDP per capita": 84000}, {"City": "Venice", "Country": "Italy", "Latitude": 45.4408, "Longitude": 12.3155, "Population": 250000, "Elevation": 2, "Year Founded": 421, "GDP": 35000000, "GDP per capita": 140000}, {"City": "Hiroshima", "Country": "Japan", "Latitude": 34.3853, "Longitude": 132.4553, "Population": 1170000, "Elevation": 5, "Year Founded": 1589, "GDP": 45000000, "GDP per capita": 38000}, {"City": "Kobe", "Country": "Japan", "Latitude": 29.7036, "Longitude": -41.3644, "Population": 2882788, "Elevation": 648, "Year Founded": 1521, "GDP": 291639960073, "GDP per capita": 80904}, {"City": "Kyoto", "Country": "Japan", "Latitude": 35.0116, "Longitude": 135.7681, "Population": 1460000, "Elevation": 50, "Year Founded": 794, "GDP": 70000000, "GDP per capita": 48000}, {"City": "Nara", "Country": "Japan", "Latitude": 21.0294, "Longitude": 70.4087, "Population": 169756, "Elevation": 61, "Year Founded": 885, "GDP": 10872088196, "GDP per capita": 64895}, {"City": "Osaka", "Country": "Japan", "Latitude": 34.6937, "Longitude": 135.5023, "Population": 2750000, "Elevation": 5, "Year Founded": 1889, "GDP": 450000000, "GDP per capita": 164000}, {"City": "Sapporo", "Country": "Japan", "Latitude": 43.0618, "Longitude": 141.3545, "Population": 1970000, "Elevation": 29, "Year Founded": 1868, "GDP": 65000000, "GDP per capita": 33000}, {"City": "Tokyo", "Country": "Japan", "Latitude": 35.6762, "Longitude": 139.6503, "Population": 14094000, "Elevation": 40, "Year Founded": 1603, "GDP": 2100000000, "GDP per capita": 149000}, {"City": "Amman", "Country": "Jordan", "Latitude": 31.9539, "Longitude": 35.9106, "Population": 4000000, "Elevation": 800, "Year Founded": 725, "GDP": 35000000, "GDP per capita": 9000}, {"City": "Mombasa", "Country": "Kenya", "Latitude": -4.0435, "Longitude": 39.6682, "Population": 1200000, "Elevation": 50, "Year Founded": 900, "GDP": 8000000, "GDP per capita": 7000}, {"City": "Nairobi", "Country": "Kenya", "Latitude": -1.2921, "Longitude": 36.8219, "Population": 4846000, "Elevation": 1795, "Year Founded": 1899, "GDP": 35000000, "GDP per capita": 7000}, {"City": "Kuwait City", "Country": "Kuwait", "Latitude": 29.3759, "Longitude": 47.9774, "Population": 3200000, "Elevation": 28, "Year Founded": 1716, "GDP": 75000000, "GDP per capita": 23000}, {"City": "Riga", "Country": "Latvia", "Latitude": 56.9496, "Longitude": 24.1052, "Population": 605000, "Elevation": 6, "Year Founded": 1201, "GDP": 30000000, "GDP per capita": 50000}, {"City": "Beirut", "Country": "Lebanon", "Latitude": 33.8938, "Longitude": 35.5018, "Population": 1100000, "Elevation": 40, "Year Founded": -1400, "GDP": 30000000, "GDP per capita": 27000}, {"City": "Vilnius", "Country": "Lithuania", "Latitude": 54.6872, "Longitude": 25.2797, "Population": 600000, "Elevation": 112, "Year Founded": 1323, "GDP": 30000000, "GDP per capita": 50000}, {"City": "Kuala Lumpur", "Country": "Malaysia", "Latitude": 3.139, "Longitude": 101.6869, "Population": 2000000, "Elevation": 66, "Year Founded": 1857, "GDP": 200000000, "GDP per capita": 100000}, {"City": "Cancun", "Country": "Mexico", "Latitude": 21.1619, "Longitude": -86.8515, "Population": 900000, "Elevation": 10, "Year Founded": 1970, "GDP": 30000000, "GDP per capita": 33000}, {"City": "Guadalajara", "Country": "Mexico", "Latitude": 20.6597, "Longitude": -103.3496, "Population": 1400000, "Elevation": 1566, "Year Founded": 1542, "GDP": 110000000, "GDP per capita": 79000}, {"City": "Mexico City", "Country": "Mexico", "Latitude": 19.4326, "Longitude": -99.1332, "Population": 9209944, "Elevation": 2240, "Year Founded": 1325, "GDP": 411000000, "GDP per capita": 45000}, {"City": "Monterrey", "Country": "Mexico", "Latitude": 25.6866, "Longitude": -100.3161, "Population": 1140000, "Elevation": 540, "Year Founded": 1596, "GDP": 140000000, "GDP per capita": 123000}, {"City": "Oaxaca", "Country": "Mexico", "Latitude": 17.0732, "Longitude": -96.7266, "Population": 300000, "Elevation": 1555, "Year Founded": 1486, "GDP": 8000000, "GDP per capita": 27000}, {"City": "Tijuana", "Country": "Mexico", "Latitude": -14.9186, "Longitude": -142.0316, "Population": 2828582, "Elevation": 48, "Year Founded": 1883, "GDP": 109605840763, "GDP per capita": 47660}, {"City": "Tulum", "Country": "Mexico", "Latitude": 20.2114, "Longitude": -87.4654, "Population": 46000, "Elevation": 10, "Year Founded": 100, "GDP": 3000000, "GDP per capita": 65000}, {"City": "Monaco", "Country": "Monaco", "Latitude": 43.7384, "Longitude": 7.4246, "Population": 39000, "Elevation": 35, "Year Founded": 1215, "GDP": 7000000, "GDP per capita": 180000}, {"City": "Casablanca", "Country": "Morocco", "Latitude": 33.5731, "Longitude": -7.5898, "Population": 3800000, "Elevation": 27, "Year Founded": 768, "GDP": 110000000, "GDP per capita": 29000}, {"City": "Fez", "Country": "Morocco", "Latitude": 34.0181, "Longitude": -5.0078, "Population": 1100000, "Elevation": 410, "Year Founded": 789, "GDP": 20000000, "GDP per capita": 18000}, {"City": "Marrakesh", "Country": "Morocco", "Latitude": 31.6295, "Longitude": -7.9811, "Population": 1000000, "Elevation": 466, "Year Founded": 1070, "GDP": 25000000, "GDP per capita": 25000}, {"City": "Rabat", "Country": "Morocco", "Latitude": 34.0209, "Longitude": -6.8416, "Population": 580000, "Elevation": 75, "Year Founded": 1150, "GDP": 30000000, "GDP per capita": 52000}, {"City": "Maputo", "Country": "Mozambique", "Latitude": -25.9692, "Longitude": 32.5732, "Population": 1200000, "Elevation": 47, "Year Founded": 1782, "GDP": 20000000, "GDP per capita": 17000}, {"City": "Windhoek", "Country": "Namibia", "Latitude": -22.5609, "Longitude": 17.0658, "Population": 480000, "Elevation": 1655, "Year Founded": 1890, "GDP": 12000000, "GDP per capita": 25000}, {"City": "Kathmandu", "Country": "Nepal", "Latitude": 27.7172, "Longitude": 85.324, "Population": 845000, "Elevation": 1400, "Year Founded": 723, "GDP": 12000000, "GDP per capita": 14000}, {"City": "Pokhara", "Country": "Nepal", "Latitude": -11.7147, "Longitude": 113.597, "Population": 1891385, "Elevation": 36, "Year Founded": 1273, "GDP": 64000000000, "GDP per capita": 24941}, {"City": "Amsterdam", "Country": "Netherlands", "Latitude": 52.3676, "Longitude": 4.9041, "Population": 934000, "Elevation": 2, "Year Founded": 1275, "GDP": 250000000, "GDP per capita": 268000}, {"City": "Auckland", "Country": "New Zealand", "Latitude": -36.8509, "Longitude": 174.7645, "Population": 1700000, "Elevation": 43, "Year Founded": 1840, "GDP": 100000000, "GDP per capita": 59000}, {"City": "Christchurch", "Country": "New Zealand", "Latitude": -43.5321, "Longitude": 172.6362, "Population": 410000, "Elevation": 20, "Year Founded": 1850, "GDP": 25000000, "GDP per capita": 61000}, {"City": "Queenstown", "Country": "New Zealand", "Latitude": -45.0312, "Longitude": 168.6626, "Population": 29000, "Elevation": 310, "Year Founded": 1863, "GDP": 3000000, "GDP per capita": 103000}, {"City": "Wellington", "Country": "New Zealand", "Latitude": -41.2866, "Longitude": 174.7756, "Population": 215000, "Elevation": 7, "Year Founded": 1840, "GDP": 25000000, "GDP per capita": 116000}, {"City": "Abuja", "Country": "Nigeria", "Latitude": 9.0765, "Longitude": 7.3986, "Population": 3600000, "Elevation": 360, "Year Founded": 1828, "GDP": 20000000, "GDP per capita": 6000}, {"City": "Ibadan", "Country": "Nigeria", "Latitude": 7.3775, "Longitude": 3.947, "Population": 3500000, "Elevation": 230, "Year Founded": 1829, "GDP": 8000000, "GDP per capita": 2000}, {"City": "Kano", "Country": "Nigeria", "Latitude": 12.0022, "Longitude": 8.592, "Population": 4000000, "Elevation": 481, "Year Founded": 999, "GDP": 10000000, "GDP per capita": 3000}, {"City": "Lagos", "Country": "Nigeria", "Latitude": 6.5244, "Longitude": 3.3792, "Population": 15000000, "Elevation": 41, "Year Founded": 1760, "GDP": 110000000, "GDP per capita": 7000}, {"City": "Port Harcourt", "Country": "Nigeria", "Latitude": 4.8156, "Longitude": 7.0498, "Population": 3000000, "Elevation": 18, "Year Founded": 1912, "GDP": 10000000, "GDP per capita": 3000}, {"City": "Oslo", "Country": "Norway", "Latitude": 59.9139, "Longitude": 10.7522, "Population": 720000, "Elevation": 23, "Year Founded": 1400, "GDP": 145000000, "GDP per capita": 201000}, {"City": "Muscat", "Country": "Oman", "Latitude": 23.588, "Longitude": 58.3829, "Population": 1600000, "Elevation": 15, "Year Founded": 1744, "GDP": 45000000, "GDP per capita": 28000}, {"City": "Islamabad", "Country": "Pakistan", "Latitude": 33.6844, "Longitude": 73.0479, "Population": 1200000, "Elevation": 540, "Year Founded": 1960, "GDP": 20000000, "GDP per capita": 17000}, {"City": "Karachi", "Country": "Pakistan", "Latitude": 24.8607, "Longitude": 67.0011, "Population": 16000000, "Elevation": 8, "Year Founded": 1729, "GDP": 70000000, "GDP per capita": 4000}, {"City": "Lahore", "Country": "Pakistan", "Latitude": 31.5204, "Longitude": 74.3587, "Population": 13000000, "Elevation": 217, "Year Founded": 1000, "GDP": 55000000, "GDP per capita": 4000}, {"City": "Rawalpindi", "Country": "Pakistan", "Latitude": -39.6329, "Longitude": 86.8441, "Population": 2736244, "Elevation": 30, "Year Founded": 1430, "GDP": 191637599117, "GDP per capita": 74869}, {"City": "Panama City", "Country": "Panama", "Latitude": 8.9824, "Longitude": -79.5199, "Population": 880000, "Elevation": 2, "Year Founded": 1673, "GDP": 70000000, "GDP per capita": 80000}, {"City": "Port Moresby", "Country": "Papua New Guinea", "Latitude": -9.4438, "Longitude": 147.1803, "Population": 380000, "Elevation": 35, "Year Founded": 1873, "GDP": 4000000, "GDP per capita": 11000}, {"City": "Asunción", "Country": "Paraguay", "Latitude": -25.2637, "Longitude": -57.5759, "Population": 520000, "Elevation": 43, "Year Founded": 1537, "GDP": 25000000, "GDP per capita": 48000}, {"City": "Arequipa", "Country": "Peru", "Latitude": -16.409, "Longitude": -71.5375, "Population": 1000000, "Elevation": 2335, "Year Founded": 1540, "GDP": 15000000, "GDP per capita": 15000}, {"City": "Cusco", "Country": "Peru", "Latitude": -13.5319, "Longitude": -71.9675, "Population": 430000, "Elevation": 3399, "Year Founded": 1100, "GDP": 10000000, "GDP per capita": 23000}, {"City": "Lima", "Country": "Peru", "Latitude": -12.0464, "Longitude": -77.0428, "Population": 10300000, "Elevation": 154, "Year Founded": 1535, "GDP": 140000000, "GDP per capita": 14000}, {"City": "Cebu City", "Country": "Philippines", "Latitude": 10.3157, "Longitude": 123.8854, "Population": 960000, "Elevation": 17, "Year Founded": 1565, "GDP": 25000000, "GDP per capita": 26000}, {"City": "Manila", "Country": "Philippines", "Latitude": 14.5995, "Longitude": 120.9842, "Population": 1850000, "Elevation": 16, "Year Founded": 1571, "GDP": 140000000, "GDP per capita": 76000}, {"City": "Warsaw", "Country": "Poland", "Latitude": 52.2297, "Longitude": 21.0122, "Population": 1860000, "Elevation": 100, "Year Founded": 1300, "GDP": 145000000, "GDP per capita": 78000}, {"City": "Lisbon", "Country": "Portugal", "Latitude": 38.7223, "Longitude": -9.1393, "Population": 545000, "Elevation": 2, "Year Founded": -1200, "GDP": 115000000, "GDP per capita": 211000}, {"City": "Porto", "Country": "Portugal", "Latitude": 41.1579, "Longitude": -8.6291, "Population": 250000, "Elevation": 104, "Year Founded": 275, "GDP": 30000000, "GDP per capita": 120000}, {"City": "San Juan", "Country": "Puerto Rico", "Latitude": 18.4655, "Longitude": -66.1057, "Population": 340000, "Elevation": 8, "Year Founded": 1521, "GDP": 40000000, "GDP per capita": 118000}, {"City": "Doha", "Country": "Qatar", "Latitude": 25.2854, "Longitude": 51.531, "Population": 1200000, "Elevation": 10, "Year Founded": 1825, "GDP": 120000000, "GDP per capita": 100000}, {"City": "Bucharest", "Country": "Romania", "Latitude": 44.4268, "Longitude": 26.1025, "Population": 1710000, "Elevation": 70, "Year Founded": 1459, "GDP": 80000000, "GDP per capita": 47000}, {"City": "Moscow", "Country": "Russia", "Latitude": 55.7558, "Longitude": 37.6173, "Population": 13100000, "Elevation": 156, "Year Founded": 1147, "GDP": 450000000, "GDP per capita": 34000}, {"City": "Saint Petersburg", "Country": "Russia", "Latitude": 59.9311, "Longitude": 30.3609, "Population": 5600000, "Elevation": 3, "Year Founded": 1703, "GDP": 120000000, "GDP per capita": 21000}, {"City": "Kigali", "Country": "Rwanda", "Latitude": -1.9441, "Longitude": 30.0619, "Population": 1300000, "Elevation": 1567, "Year Founded": 1907, "GDP": 12000000, "GDP per capita": 9000}, {"City": "Jeddah", "Country": "Saudi Arabia", "Latitude": 21.4858, "Longitude": 39.1925, "Population": 4700000, "Elevation": 12, "Year Founded": 647, "GDP": 100000000, "GDP per capita": 21000}, {"City": "Mecca", "Country": "Saudi Arabia", "Latitude": -4.3348, "Longitude": 114.8579, "Population": 1283476, "Elevation": 1215, "Year Founded": 1626, "GDP": 92869185224, "GDP per capita": 69768}, {"City": "Medina", "Country": "Saudi Arabia", "Latitude": 1.6142, "Longitude": 101.6425, "Population": 2907182, "Elevation": 1261, "Year Founded": 1247, "GDP": 182539673078, "GDP per capita": 44876}, {"City": "Riyadh", "Country": "Saudi Arabia", "Latitude": 24.7136, "Longitude": 46.6753, "Population": 7800000, "Elevation": 612, "Year Founded": 1744, "GDP": 200000000, "GDP per capita": 26000}, {"City": "Dakar", "Country": "Senegal", "Latitude": 14.7167, "Longitude": -17.4677, "Population": 1200000, "Elevation": 22, "Year Founded": 1857, "GDP": 25000000, "GDP per capita": 21000}, {"City": "Belgrade", "Country": "Serbia", "Latitude": 44.7866, "Longitude": 20.4489, "Population": 1400000, "Elevation": 117, "Year Founded": 279, "GDP": 35000000, "GDP per capita": 25000}, {"City": "Singapore", "Country": "Singapore", "Latitude": 1.3521, "Longitude": 103.8198, "Population": 5920000, "Elevation": 15, "Year Founded": 1819, "GDP": 850000000, "GDP per capita": 144000}, {"City": "Cape Town", "Country": "South Africa", "Latitude": -33.9249, "Longitude": 18.4241, "Population": 4900000, "Elevation": 42, "Year Founded": 1652, "GDP": 100000000, "GDP per capita": 20000}, {"City": "Durban", "Country": "South Africa", "Latitude": -29.8587, "Longitude": 31.0218, "Population": 600000, "Elevation": 22, "Year Founded": 1835, "GDP": 30000000, "GDP per capita": 50000}, {"City": "Johannesburg", "Country": "South Africa", "Latitude": -26.2041, "Longitude": 28.0473, "Population": 6000000, "Elevation": 1753, "Year Founded": 1886, "GDP": 190000000, "GDP per capita": 32000}, {"City": "Pretoria", "Country": "South Africa", "Latitude": -25.7479, "Longitude": 28.2293, "Population": 800000, "Elevation": 1339, "Year Founded": 1855, "GDP": 30000000, "GDP per capita": 38000}, {"City": "Busan", "Country": "South Korea", "Latitude": 35.1796, "Longitude": 129.0756, "Population": 3300000, "Elevation": 15, "Year Founded": 1876, "GDP": 100000000, "GDP per capita": 30000}, {"City": "Seoul", "Country": "South Korea", "Latitude": 37.5665, "Longitude": 126.978, "Population": 9400000, "Elevation": 38, "Year Founded": 1394, "GDP": 800000000, "GDP per capita": 85000}, {"City": "Barcelona", "Country": "Spain", "Latitude": 41.3874, "Longitude": 2.1686, "Population": 1660000, "Elevation": 12, "Year Founded": 15, "GDP": 190000000, "GDP per capita": 114000}, {"City": "Madrid", "Country": "Spain", "Latitude": 40.4168, "Longitude": -3.7038, "Population": 3340000, "Elevation": 667, "Year Founded": 860, "GDP": 260000000, "GDP per capita": 78000}, {"City": "Seville", "Country": "Spain", "Latitude": 37.3891, "Longitude": -5.9845, "Population": 690000, "Elevation": 7, "Year Founded": 712, "GDP": 50000000, "GDP per capita": 72000}, {"City": "Valencia", "Country": "Spain", "Latitude": 39.4699, "Longitude": -0.3763, "Population": 800000, "Elevation": 15, "Year Founded": 138, "GDP": 55000000, "GDP per capita": 69000}, {"City": "Colombo", "Country": "Sri Lanka", "Latitude": 6.9271, "Longitude": 79.8612, "Population": 750000, "Elevation": 1, "Year Founded": 1505, "GDP": 25000000, "GDP per capita": 33000}, {"City": "Stockholm", "Country": "Sweden", "Latitude": 59.3293, "Longitude": 18.0686, "Population": 990000, "Elevation": 28, "Year Founded": 1250, "GDP": 180000000, "GDP per capita": 182000}, {"City": "Bern", "Country": "Switzerland", "Latitude": 15.2942, "Longitude": -143.8073, "Population": 2762753, "Elevation": 103, "Year Founded": 608, "GDP": 18472840827, "GDP per capita": 7357}, {"City": "Zurich", "Country": "Switzerland", "Latitude": 47.3769, "Longitude": 8.5417, "Population": 435000, "Elevation": 408, "Year Founded": 15, "GDP": 150000000, "GDP per capita": 345000}, {"City": "Taipei", "Country": "Taiwan", "Latitude": 25.033, "Longitude": 121.5654, "Population": 2500000, "Elevation": 10, "Year Founded": 1709, "GDP": 220000000, "GDP per capita": 88000}, {"City": "Arusha", "Country": "Tanzania", "Latitude": 20.0841, "Longitude": -109.9326, "Population": 1071334, "Elevation": 360, "Year Founded": 1240, "GDP": 54728315587, "GDP per capita": 46953}, {"City": "Dar es Salaam", "Country": "Tanzania", "Latitude": -6.7924, "Longitude": 39.2083, "Population": 7400000, "Elevation": 55, "Year Founded": 1865, "GDP": 25000000, "GDP per capita": 3000}, {"City": "Zanzibar City", "Country": "Tanzania", "Latitude": -27.3166, "Longitude": 25.3029, "Population": 55483, "Elevation": 846, "Year Founded": 1239, "GDP": 1257382358, "GDP per capita": 26588}, {"City": "Bangkok", "Country": "Thailand", "Latitude": 13.7563, "Longitude": 100.5018, "Population": 10500000, "Elevation": 1, "Year Founded": 1782, "GDP": 290000000, "GDP per capita": 28000}, {"City": "Chiang Mai", "Country": "Thailand", "Latitude": 18.7883, "Longitude": 98.9853, "Population": 120000, "Elevation": 310, "Year Founded": 1296, "GDP": 10000000, "GDP per capita": 83000}, {"City": "Pattaya", "Country": "Thailand", "Latitude": 2.845, "Longitude": -22.7453, "Population": 2859617, "Elevation": 547, "Year Founded": 1667, "GDP": 81367159590, "GDP per capita": 38310}, {"City": "Phuket", "Country": "Thailand", "Latitude": 7.8804, "Longitude": 98.3923, "Population": 100000, "Elevation": 28, "Year Founded": 1780, "GDP": 15000000, "GDP per capita": 150000}, {"City": "Tunis", "Country": "Tunisia", "Latitude": 36.8065, "Longitude": 10.1815, "Population": 1050000, "Elevation": 4, "Year Founded": 698, "GDP": 35000000, "GDP per capita": 33000}, {"City": "Istanbul", "Country": "Turkey", "Latitude": 41.0082, "Longitude": 28.9784, "Population": 15800000, "Elevation": 40, "Year Founded": 330, "GDP": 300000000, "GDP per capita": 19000}, {"City": "Kampala", "Country": "Uganda", "Latitude": 0.3476, "Longitude": 32.5825, "Population": 1800000, "Elevation": 1190, "Year Founded": 1890, "GDP": 18000000, "GDP per capita": 10000}, {"City": "Kyiv", "Country": "Ukraine", "Latitude": 50.4501, "Longitude": 30.5234, "Population": 2950000, "Elevation": 179, "Year Founded": 482, "GDP": 70000000, "GDP per capita": 24000}, {"City": "Abu Dhabi", "Country": "United Arab Emirates", "Latitude": 24.4539, "Longitude": 54.3773, "Population": 1500000, "Elevation": 27, "Year Founded": 1760, "GDP": 100000000, "GDP per capita": 67000}, {"City": "Dubai", "Country": "United Arab Emirates", "Latitude": 25.2048, "Longitude": 55.2708, "Population": 3600000, "Elevation": 16, "Year Founded": 1833, "GDP": 120000000, "GDP per capita": 33000}, {"City": "Sharjah", "Country": "United Arab Emirates", "Latitude": 3.7031, "Longitude": -94.706, "Population": 2953007, "Elevation": 863, "Year Founded": 1712, "GDP": 345188175566, "GDP per capita": 86790}, {"City": "Edinburgh", "Country": "United Kingdom", "Latitude": 55.9533, "Longitude": -3.1883, "Population": 550000, "Elevation": 47, "Year Founded": 1124, "GDP": 95000000, "GDP per capita": 173000}, {"City": "Glasgow", "Country": "United Kingdom", "Latitude": 55.8642, "Longitude": -4.2518, "Population": 635000, "Elevation": 40, "Year Founded": 543, "GDP": 80000000, "GDP per capita": 126000}, {"City": "London", "Country": "United Kingdom", "Latitude": 51.5074, "Longitude": -0.1278, "Population": 8908081, "Elevation": 11, "Year Founded": 43, "GDP": 1100000000, "GDP per capita": 123000}, {"City": "Anchorage", "Country": "United States", "Latitude": 61.2181, "Longitude": -149.9003, "Population": 290000, "Elevation": 31, "Year Founded": 1920, "GDP": 45000000, "GDP per capita": 155000}, {"City": "Atlanta", "Country": "United States", "Latitude": 33.749, "Longitude": -84.388, "Population": 510823, "Elevation": 320, "Year Founded": 1837, "GDP": 385000000, "GDP per capita": 754000}, {"City": "Austin", "Country": "United States", "Latitude": 30.2672, "Longitude": -97.7431, "Population": 979882, "Elevation": 149, "Year Founded": 1839, "GDP": 215000000, "GDP per capita": 220000}, {"City": "Boston", "Country": "United States", "Latitude": 42.3601, "Longitude": -71.0589, "Population": 673458, "Elevation": 43, "Year Founded": 1630, "GDP": 540000000, "GDP per capita": 802000}, {"City": "Chicago", "Country": "United States", "Latitude": 41.8781, "Longitude": -87.6298, "Population": 2665039, "Elevation": 181, "Year Founded": 1833, "GDP": 895000000, "GDP per capita": 336000}, {"City": "Dallas", "Country": "United States", "Latitude": 32.7767, "Longitude": -96.797, "Population": 1302868, "Elevation": 131, "Year Founded": 1841, "GDP": 740000000, "GDP per capita": 568000}, {"City": "Denver", "Country": "United States", "Latitude": 39.7392, "Longitude": -104.9903, "Population": 715522, "Elevation": 1609, "Year Founded": 1858, "GDP": 350000000, "GDP per capita": 489000}, {"City": "Durham", "Country": "United States", "Latitude": 13.3545, "Longitude": -88.5105, "Population": 2936095, "Elevation": 525, "Year Founded": 1865, "GDP": 136645844723, "GDP per capita": 53634}, {"City": "Honolulu", "Country": "United States", "Latitude": 21.3069, "Longitude": -157.8583, "Population": 350964, "Elevation": 5, "Year Founded": 1900, "GDP": 105000000, "GDP per capita": 299000}, {"City": "Houston", "Country": "United States", "Latitude": 29.7604, "Longitude": -95.3698, "Population": 2314157, "Elevation": 13, "Year Founded": 1836, "GDP": 590000000, "GDP per capita": 255000}, {"City": "Las Vegas", "Country": "United States", "Latitude": 36.1716, "Longitude": -115.1391, "Population": 660929, "Elevation": 610, "Year Founded": 1905, "GDP": 180000000, "GDP per capita": 272000}, {"City": "Los Angeles", "Country": "United States", "Latitude": 34.0522, "Longitude": -118.2437, "Population": 3820914, "Elevation": 71, "Year Founded": 1781, "GDP": 1170000000, "GDP per capita": 306000}, {"City": "Miami", "Country": "United States", "Latitude": 25.7617, "Longitude": -80.1918, "Population": 455924, "Elevation": 2, "Year Founded": 1896, "GDP": 190000000, "GDP per capita": 417000}, {"City": "Nashville", "Country": "United States", "Latitude": 36.1627, "Longitude": -86.7816, "Population": 715000, "Elevation": 182, "Year Founded": 1779, "GDP": 105000000, "GDP per capita": 147000}, {"City": "New Orleans", "Country": "United States", "Latitude": 29.9511, "Longitude": -90.0715, "Population": 370000, "Elevation": 2, "Year Founded": 1718, "GDP": 80000000, "GDP per capita": 216000}, {"City": "New York City", "Country": "United States", "Latitude": 40.7128, "Longitude": -74.006, "Population": 8478072, "Elevation": 10, "Year Founded": 1624, "GDP": 2290000000, "GDP per capita": 270000}, {"City": "Philadelphia", "Country": "United States", "Latitude": 39.9526, "Longitude": -75.1652, "Population": 1550542, "Elevation": 12, "Year Founded": 1682, "GDP": 540000000, "GDP per capita": 348000}, {"City": "San Antonio", "Country": "United States", "Latitude": 29.4241, "Longitude": -98.4936, "Population": 1472909, "Elevation": 198, "Year Founded": 1718, "GDP": 210000000, "GDP per capita": 143000}, {"City": "San Diego", "Country": "United States", "Latitude": 32.7157, "Longitude": -117.1611, "Population": 1386932, "Elevation": 20, "Year Founded": 1769, "GDP": 268000000, "GDP per capita": 193000}, {"City": "Seattle", "Country": "United States", "Latitude": 47.6062, "Longitude": -122.3321, "Population": 755078, "Elevation": 56, "Year Founded": 1851, "GDP": 480000000, "GDP per capita": 636000}, {"City": "Washington, D.C.", "Country": "United States", "Latitude": 38.9072, "Longitude": -77.0369, "Population": 678972, "Elevation": 7, "Year Founded": 1790, "GDP": 550000000, "GDP per capita": 810000}, {"City": "Montevideo", "Country": "Uruguay", "Latitude": -34.9011, "Longitude": -56.1645, "Population": 1400000, "Elevation": 43, "Year Founded": 1726, "GDP": 55000000, "GDP per capita": 39000}, {"City": "Da Nang", "Country": "Vietnam", "Latitude": 27.237, "Longitude": -123.5655, "Population": 435845, "Elevation": 1280, "Year Founded": 1327, "GDP": 15034854837, "GDP per capita": 32123}, {"City": "Hanoi", "Country": "Vietnam", "Latitude": 21.0278, "Longitude": 105.8342, "Population": 8400000, "Elevation": 19, "Year Founded": 1010, "GDP": 70000000, "GDP per capita": 8000}, {"City": "Ho Chi Minh City", "Country": "Vietnam", "Latitude": 10.8231, "Longitude": 106.6297, "Population": 9600000, "Elevation": 19, "Year Founded": 1698, "GDP": 110000000, "GDP per capita": 11000}, {"City": "Victoria Falls", "Country": "Zimbabwe", "Latitude": 62.1654, "Longitude": -49.0572, "Population": 2457118, "Elevation": 853, "Year Founded": 529, "GDP": 86149860055, "GDP per capita": 35023}];
+const RAW_CITIES = [
+  {
+    "City": "Herat",
+    "Country": "Afghanistan",
+    "Latitude": 34.3491,
+    "Longitude": 62.2163,
+    "Population": 673273,
+    "Elevation": 920,
+    "Year Founded": -500,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Kabul",
+    "Country": "Afghanistan",
+    "Latitude": 34.5553,
+    "Longitude": 69.2075,
+    "Population": 4600000,
+    "Elevation": 1790,
+    "Year Founded": 1776,
+    "GDP": 8000000000,
+    "GDP per capita": 2000
+  },
+  {
+    "City": "Algiers",
+    "Country": "Algeria",
+    "Latitude": 36.7538,
+    "Longitude": 3.0588,
+    "Population": 3500000,
+    "Elevation": 25,
+    "Year Founded": 944,
+    "GDP": 55000000000,
+    "GDP per capita": 16000
+  },
+  {
+    "City": "Andorra la Vella",
+    "Country": "Andorra",
+    "Latitude": 42.5063,
+    "Longitude": 1.5218,
+    "Population": 23000,
+    "Elevation": 1023,
+    "Year Founded": 1278,
+    "GDP": 1500000000,
+    "GDP per capita": 65000
+  },
+  {
+    "City": "Benguela",
+    "Country": "Angola",
+    "Latitude": -12.5763,
+    "Longitude": 13.4055,
+    "Population": 561775,
+    "Elevation": 39,
+    "Year Founded": 1617,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Luanda",
+    "Country": "Angola",
+    "Latitude": -8.839,
+    "Longitude": 13.2894,
+    "Population": 9000000,
+    "Elevation": 6,
+    "Year Founded": 1576,
+    "GDP": 45000000000,
+    "GDP per capita": 5000
+  },
+  {
+    "City": "Buenos Aires",
+    "Country": "Argentina",
+    "Latitude": -34.6037,
+    "Longitude": -58.3816,
+    "Population": 3100000,
+    "Elevation": 25,
+    "Year Founded": 1536,
+    "GDP": 220000000000,
+    "GDP per capita": 71000
+  },
+  {
+    "City": "Mendoza",
+    "Country": "Argentina",
+    "Latitude": -32.8895,
+    "Longitude": -68.8458,
+    "Population": 115000,
+    "Elevation": 746,
+    "Year Founded": 1561,
+    "GDP": 10000000000,
+    "GDP per capita": 87000
+  },
+  {
+    "City": "Ushuaia",
+    "Country": "Argentina",
+    "Latitude": -54.8019,
+    "Longitude": -68.303,
+    "Population": 80000,
+    "Elevation": 23,
+    "Year Founded": 1884,
+    "GDP": 4000000000,
+    "GDP per capita": 50000
+  },
+  {
+    "City": "Yerevan",
+    "Country": "Armenia",
+    "Latitude": 40.1872,
+    "Longitude": 44.5152,
+    "Population": 1090000,
+    "Elevation": 990,
+    "Year Founded": 782,
+    "GDP": 20000000000,
+    "GDP per capita": 18000
+  },
+  {
+    "City": "Adelaide",
+    "Country": "Australia",
+    "Latitude": -34.9285,
+    "Longitude": 138.6007,
+    "Population": 1400000,
+    "Elevation": 50,
+    "Year Founded": 1836,
+    "GDP": 90000000000,
+    "GDP per capita": 64000
+  },
+  {
+    "City": "Brisbane",
+    "Country": "Australia",
+    "Latitude": -27.4698,
+    "Longitude": 153.0251,
+    "Population": 2600000,
+    "Elevation": 32,
+    "Year Founded": 1825,
+    "GDP": 170000000000,
+    "GDP per capita": 65000
+  },
+  {
+    "City": "Cairns",
+    "Country": "Australia",
+    "Latitude": -16.9186,
+    "Longitude": 145.7781,
+    "Population": 153181,
+    "Elevation": 7,
+    "Year Founded": 1876,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Canberra",
+    "Country": "Australia",
+    "Latitude": -35.2809,
+    "Longitude": 149.13,
+    "Population": 470000,
+    "Elevation": 578,
+    "Year Founded": 1913,
+    "GDP": 35000000000,
+    "GDP per capita": 74000
+  },
+  {
+    "City": "Melbourne",
+    "Country": "Australia",
+    "Latitude": -37.8136,
+    "Longitude": 144.9631,
+    "Population": 5200000,
+    "Elevation": 31,
+    "Year Founded": 1835,
+    "GDP": 430000000000,
+    "GDP per capita": 83000
+  },
+  {
+    "City": "Perth",
+    "Country": "Australia",
+    "Latitude": -31.9505,
+    "Longitude": 115.8605,
+    "Population": 2100000,
+    "Elevation": 31,
+    "Year Founded": 1829,
+    "GDP": 150000000000,
+    "GDP per capita": 71000
+  },
+  {
+    "City": "Sydney",
+    "Country": "Australia",
+    "Latitude": -33.8688,
+    "Longitude": 151.2093,
+    "Population": 5312000,
+    "Elevation": 3,
+    "Year Founded": 1788,
+    "GDP": 480000000000,
+    "GDP per capita": 90000
+  },
+  {
+    "City": "Vienna",
+    "Country": "Austria",
+    "Latitude": 48.2082,
+    "Longitude": 16.3738,
+    "Population": 2020000,
+    "Elevation": 171,
+    "Year Founded": 1192,
+    "GDP": 160000000000,
+    "GDP per capita": 79000
+  },
+  {
+    "City": "Baku",
+    "Country": "Azerbaijan",
+    "Latitude": 40.4093,
+    "Longitude": 49.8671,
+    "Population": 2300000,
+    "Elevation": -28,
+    "Year Founded": 5,
+    "GDP": 80000000000,
+    "GDP per capita": 35000
+  },
+  {
+    "City": "Chittagong",
+    "Country": "Bangladesh",
+    "Latitude": 22.3569,
+    "Longitude": 91.7832,
+    "Population": 5000000,
+    "Elevation": 6,
+    "Year Founded": 1666,
+    "GDP": 35000000000,
+    "GDP per capita": 7000
+  },
+  {
+    "City": "Dhaka",
+    "Country": "Bangladesh",
+    "Latitude": 23.8103,
+    "Longitude": 90.4125,
+    "Population": 10000000,
+    "Elevation": 4,
+    "Year Founded": 1608,
+    "GDP": 140000000000,
+    "GDP per capita": 14000
+  },
+  {
+    "City": "Brussels",
+    "Country": "Belgium",
+    "Latitude": 50.8503,
+    "Longitude": 4.3517,
+    "Population": 1220000,
+    "Elevation": 13,
+    "Year Founded": 979,
+    "GDP": 180000000000,
+    "GDP per capita": 148000
+  },
+  {
+    "City": "La Paz",
+    "Country": "Bolivia",
+    "Latitude": -16.4897,
+    "Longitude": -68.1193,
+    "Population": 780000,
+    "Elevation": 3640,
+    "Year Founded": 1548,
+    "GDP": 25000000000,
+    "GDP per capita": 32000
+  },
+  {
+    "City": "Santa Cruz de la Sierra",
+    "Country": "Bolivia",
+    "Latitude": -17.7833,
+    "Longitude": -63.1821,
+    "Population": 1900000,
+    "Elevation": 416,
+    "Year Founded": 1561,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Sarajevo",
+    "Country": "Bosnia and Herzegovina",
+    "Latitude": 43.8563,
+    "Longitude": 18.4131,
+    "Population": 275000,
+    "Elevation": 518,
+    "Year Founded": 1461,
+    "GDP": 8000000000,
+    "GDP per capita": 29000
+  },
+  {
+    "City": "Gaborone",
+    "Country": "Botswana",
+    "Latitude": -24.6282,
+    "Longitude": 25.9231,
+    "Population": 250000,
+    "Elevation": 1000,
+    "Year Founded": 1884,
+    "GDP": 8000000000,
+    "GDP per capita": 32000
+  },
+  {
+    "City": "Brasília",
+    "Country": "Brazil",
+    "Latitude": -15.7975,
+    "Longitude": -47.8919,
+    "Population": 3100000,
+    "Elevation": 1172,
+    "Year Founded": 1960,
+    "GDP": 140000000000,
+    "GDP per capita": 45000
+  },
+  {
+    "City": "Foz do Iguaçu",
+    "Country": "Brazil",
+    "Latitude": -25.5163,
+    "Longitude": -54.5854,
+    "Population": 260000,
+    "Elevation": 173,
+    "Year Founded": 1914,
+    "GDP": 7000000000,
+    "GDP per capita": 27000
+  },
+  {
+    "City": "Rio de Janeiro",
+    "Country": "Brazil",
+    "Latitude": -22.9068,
+    "Longitude": -43.1729,
+    "Population": 6700000,
+    "Elevation": 2,
+    "Year Founded": 1565,
+    "GDP": 330000000000,
+    "GDP per capita": 49000
+  },
+  {
+    "City": "Salvador",
+    "Country": "Brazil",
+    "Latitude": -12.9777,
+    "Longitude": -38.5016,
+    "Population": 2900000,
+    "Elevation": 8,
+    "Year Founded": 1549,
+    "GDP": 55000000000,
+    "GDP per capita": 19000
+  },
+  {
+    "City": "São Paulo",
+    "Country": "Brazil",
+    "Latitude": -23.5505,
+    "Longitude": -46.6333,
+    "Population": 11897000,
+    "Elevation": 760,
+    "Year Founded": 1554,
+    "GDP": 430000000000,
+    "GDP per capita": 36000
+  },
+  {
+    "City": "Sofia",
+    "Country": "Bulgaria",
+    "Latitude": 42.6977,
+    "Longitude": 23.3219,
+    "Population": 1280000,
+    "Elevation": 550,
+    "Year Founded": 809,
+    "GDP": 30000000000,
+    "GDP per capita": 23000
+  },
+  {
+    "City": "Phnom Penh",
+    "Country": "Cambodia",
+    "Latitude": 11.5564,
+    "Longitude": 104.9282,
+    "Population": 2300000,
+    "Elevation": 23,
+    "Year Founded": 1434,
+    "GDP": 25000000000,
+    "GDP per capita": 11000
+  },
+  {
+    "City": "Siem Reap",
+    "Country": "Cambodia",
+    "Latitude": 13.3618,
+    "Longitude": 103.8606,
+    "Population": 245494,
+    "Elevation": 18,
+    "Year Founded": 968,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Calgary",
+    "Country": "Canada",
+    "Latitude": 51.0447,
+    "Longitude": -114.0719,
+    "Population": 1350000,
+    "Elevation": 1045,
+    "Year Founded": 1875,
+    "GDP": 125000000000,
+    "GDP per capita": 93000
+  },
+  {
+    "City": "London",
+    "Country": "Canada",
+    "Latitude": 42.9849,
+    "Longitude": -81.2453,
+    "Population": 422324,
+    "Elevation": 251,
+    "Year Founded": 1826,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Montreal",
+    "Country": "Canada",
+    "Latitude": 45.5019,
+    "Longitude": -73.5674,
+    "Population": 1800000,
+    "Elevation": 36,
+    "Year Founded": 1642,
+    "GDP": 200000000000,
+    "GDP per capita": 111000
+  },
+  {
+    "City": "Ottawa",
+    "Country": "Canada",
+    "Latitude": 45.4215,
+    "Longitude": -75.6972,
+    "Population": 1100000,
+    "Elevation": 70,
+    "Year Founded": 1826,
+    "GDP": 75000000000,
+    "GDP per capita": 68000
+  },
+  {
+    "City": "Quebec City",
+    "Country": "Canada",
+    "Latitude": 46.8139,
+    "Longitude": -71.208,
+    "Population": 550000,
+    "Elevation": 98,
+    "Year Founded": 1608,
+    "GDP": 40000000000,
+    "GDP per capita": 73000
+  },
+  {
+    "City": "Toronto",
+    "Country": "Canada",
+    "Latitude": 43.6532,
+    "Longitude": -79.3832,
+    "Population": 3020000,
+    "Elevation": 76,
+    "Year Founded": 1793,
+    "GDP": 420000000000,
+    "GDP per capita": 139000
+  },
+  {
+    "City": "Vancouver",
+    "Country": "Canada",
+    "Latitude": 49.2827,
+    "Longitude": -123.1207,
+    "Population": 675000,
+    "Elevation": 2,
+    "Year Founded": 1886,
+    "GDP": 145000000000,
+    "GDP per capita": 215000
+  },
+  {
+    "City": "Santiago",
+    "Country": "Chile",
+    "Latitude": -33.4489,
+    "Longitude": -70.6693,
+    "Population": 6200000,
+    "Elevation": 520,
+    "Year Founded": 1541,
+    "GDP": 200000000000,
+    "GDP per capita": 32000
+  },
+  {
+    "City": "Valparaíso",
+    "Country": "Chile",
+    "Latitude": -33.0472,
+    "Longitude": -71.6127,
+    "Population": 300000,
+    "Elevation": 10,
+    "Year Founded": 1536,
+    "GDP": 25000000000,
+    "GDP per capita": 83000
+  },
+  {
+    "City": "Beijing",
+    "Country": "China",
+    "Latitude": 39.9042,
+    "Longitude": 116.4074,
+    "Population": 21800000,
+    "Elevation": 44,
+    "Year Founded": 1045,
+    "GDP": 700000000000,
+    "GDP per capita": 32000
+  },
+  {
+    "City": "Chengdu",
+    "Country": "China",
+    "Latitude": 30.5728,
+    "Longitude": 104.0668,
+    "Population": 21000000,
+    "Elevation": 500,
+    "Year Founded": 311,
+    "GDP": 450000000000,
+    "GDP per capita": 21000
+  },
+  {
+    "City": "Chongqing",
+    "Country": "China",
+    "Latitude": 29.563,
+    "Longitude": 106.5516,
+    "Population": 32000000,
+    "Elevation": 259,
+    "Year Founded": 1189,
+    "GDP": 430000000000,
+    "GDP per capita": 13000
+  },
+  {
+    "City": "Guangzhou",
+    "Country": "China",
+    "Latitude": 23.1291,
+    "Longitude": 113.2644,
+    "Population": 15000000,
+    "Elevation": 21,
+    "Year Founded": -214,
+    "GDP": 480000000000,
+    "GDP per capita": 32000
+  },
+  {
+    "City": "Hangzhou",
+    "Country": "China",
+    "Latitude": 30.2741,
+    "Longitude": 120.1551,
+    "Population": 12000000,
+    "Elevation": 19,
+    "Year Founded": 589,
+    "GDP": 350000000000,
+    "GDP per capita": 29000
+  },
+  {
+    "City": "Harbin",
+    "Country": "China",
+    "Latitude": 45.8038,
+    "Longitude": 126.5349,
+    "Population": 5300000,
+    "Elevation": 150,
+    "Year Founded": 1898,
+    "GDP": 90000000000,
+    "GDP per capita": 17000
+  },
+  {
+    "City": "Kunming",
+    "Country": "China",
+    "Latitude": 25.0389,
+    "Longitude": 102.7183,
+    "Population": 8500000,
+    "Elevation": 1890,
+    "Year Founded": 765,
+    "GDP": 110000000000,
+    "GDP per capita": 13000
+  },
+  {
+    "City": "Nanjing",
+    "Country": "China",
+    "Latitude": 32.0603,
+    "Longitude": 118.7969,
+    "Population": 9500000,
+    "Elevation": 15,
+    "Year Founded": 495,
+    "GDP": 250000000000,
+    "GDP per capita": 26000
+  },
+  {
+    "City": "Qingdao",
+    "Country": "China",
+    "Latitude": 36.0671,
+    "Longitude": 120.3826,
+    "Population": 10000000,
+    "Elevation": 25,
+    "Year Founded": 1891,
+    "GDP": 180000000000,
+    "GDP per capita": 18000
+  },
+  {
+    "City": "Shanghai",
+    "Country": "China",
+    "Latitude": 31.2304,
+    "Longitude": 121.4737,
+    "Population": 24800000,
+    "Elevation": 4,
+    "Year Founded": 1291,
+    "GDP": 1100000000000,
+    "GDP per capita": 44000
+  },
+  {
+    "City": "Shenzhen",
+    "Country": "China",
+    "Latitude": 22.5431,
+    "Longitude": 114.0579,
+    "Population": 17600000,
+    "Elevation": 6,
+    "Year Founded": 1979,
+    "GDP": 550000000000,
+    "GDP per capita": 31000
+  },
+  {
+    "City": "Wuhan",
+    "Country": "China",
+    "Latitude": 30.5928,
+    "Longitude": 114.3055,
+    "Population": 13000000,
+    "Elevation": 23,
+    "Year Founded": 192,
+    "GDP": 250000000000,
+    "GDP per capita": 19000
+  },
+  {
+    "City": "Xi'an",
+    "Country": "China",
+    "Latitude": 34.3416,
+    "Longitude": 108.9398,
+    "Population": 13000000,
+    "Elevation": 405,
+    "Year Founded": 1000,
+    "GDP": 250000000000,
+    "GDP per capita": 19000
+  },
+  {
+    "City": "Bogotá",
+    "Country": "Colombia",
+    "Latitude": 4.711,
+    "Longitude": -74.0721,
+    "Population": 7900000,
+    "Elevation": 2640,
+    "Year Founded": 1538,
+    "GDP": 140000000000,
+    "GDP per capita": 18000
+  },
+  {
+    "City": "Cartagena",
+    "Country": "Colombia",
+    "Latitude": 10.391,
+    "Longitude": -75.4794,
+    "Population": 1100000,
+    "Elevation": 2,
+    "Year Founded": 1533,
+    "GDP": 20000000000,
+    "GDP per capita": 18000
+  },
+  {
+    "City": "Medellín",
+    "Country": "Colombia",
+    "Latitude": 6.2442,
+    "Longitude": -75.5812,
+    "Population": 2600000,
+    "Elevation": 1495,
+    "Year Founded": 1616,
+    "GDP": 45000000000,
+    "GDP per capita": 17000
+  },
+  {
+    "City": "San José",
+    "Country": "Costa Rica",
+    "Latitude": 9.9281,
+    "Longitude": -84.0907,
+    "Population": 350000,
+    "Elevation": 1172,
+    "Year Founded": 1738,
+    "GDP": 25000000000,
+    "GDP per capita": 71000
+  },
+  {
+    "City": "Dubrovnik",
+    "Country": "Croatia",
+    "Latitude": 42.6507,
+    "Longitude": 18.0944,
+    "Population": 42000,
+    "Elevation": 3,
+    "Year Founded": 639,
+    "GDP": 5000000000,
+    "GDP per capita": 119000
+  },
+  {
+    "City": "Zagreb",
+    "Country": "Croatia",
+    "Latitude": 45.815,
+    "Longitude": 15.9819,
+    "Population": 770000,
+    "Elevation": 158,
+    "Year Founded": 1094,
+    "GDP": 35000000000,
+    "GDP per capita": 45000
+  },
+  {
+    "City": "Havana",
+    "Country": "Cuba",
+    "Latitude": 23.1136,
+    "Longitude": -82.3666,
+    "Population": 2100000,
+    "Elevation": 59,
+    "Year Founded": 1519,
+    "GDP": 30000000000,
+    "GDP per capita": 14000
+  },
+  {
+    "City": "Prague",
+    "Country": "Czech Republic",
+    "Latitude": 50.0755,
+    "Longitude": 14.4378,
+    "Population": 1390000,
+    "Elevation": 235,
+    "Year Founded": 885,
+    "GDP": 120000000000,
+    "GDP per capita": 86000
+  },
+  {
+    "City": "Kinshasa",
+    "Country": "DR Congo",
+    "Latitude": -4.4419,
+    "Longitude": 15.2663,
+    "Population": 17000000,
+    "Elevation": 240,
+    "Year Founded": 1881,
+    "GDP": 25000000000,
+    "GDP per capita": 2000
+  },
+  {
+    "City": "Copenhagen",
+    "Country": "Denmark",
+    "Latitude": 55.6761,
+    "Longitude": 12.5683,
+    "Population": 660000,
+    "Elevation": 14,
+    "Year Founded": 1167,
+    "GDP": 135000000000,
+    "GDP per capita": 205000
+  },
+  {
+    "City": "Santo Domingo",
+    "Country": "Dominican Republic",
+    "Latitude": 18.4861,
+    "Longitude": -69.9312,
+    "Population": 1100000,
+    "Elevation": 14,
+    "Year Founded": 1496,
+    "GDP": 30000000000,
+    "GDP per capita": 27000
+  },
+  {
+    "City": "Guayaquil",
+    "Country": "Ecuador",
+    "Latitude": -2.1709,
+    "Longitude": -79.9224,
+    "Population": 2700000,
+    "Elevation": 4,
+    "Year Founded": 1538,
+    "GDP": 30000000000,
+    "GDP per capita": 11000
+  },
+  {
+    "City": "Manta",
+    "Country": "Ecuador",
+    "Latitude": -0.9677,
+    "Longitude": -80.7089,
+    "Population": 264281,
+    "Elevation": 6,
+    "Year Founded": 1534,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Quito",
+    "Country": "Ecuador",
+    "Latitude": -0.1807,
+    "Longitude": -78.4678,
+    "Population": 2800000,
+    "Elevation": 2850,
+    "Year Founded": 1534,
+    "GDP": 35000000000,
+    "GDP per capita": 13000
+  },
+  {
+    "City": "Alexandria",
+    "Country": "Egypt",
+    "Latitude": 31.2001,
+    "Longitude": 29.9187,
+    "Population": 5200000,
+    "Elevation": 5,
+    "Year Founded": -331,
+    "GDP": 40000000000,
+    "GDP per capita": 8000
+  },
+  {
+    "City": "Cairo",
+    "Country": "Egypt",
+    "Latitude": 30.0444,
+    "Longitude": 31.2357,
+    "Population": 10230350,
+    "Elevation": 23,
+    "Year Founded": 969,
+    "GDP": 120000000000,
+    "GDP per capita": 12000
+  },
+  {
+    "City": "Giza",
+    "Country": "Egypt",
+    "Latitude": 30.0131,
+    "Longitude": 31.2089,
+    "Population": 4200000,
+    "Elevation": 19,
+    "Year Founded": -2560,
+    "GDP": 45000000000,
+    "GDP per capita": 11000
+  },
+  {
+    "City": "Luxor",
+    "Country": "Egypt",
+    "Latitude": 25.6872,
+    "Longitude": 32.6396,
+    "Population": 500000,
+    "Elevation": 89,
+    "Year Founded": -2160,
+    "GDP": 5000000000,
+    "GDP per capita": 10000
+  },
+  {
+    "City": "Tallinn",
+    "Country": "Estonia",
+    "Latitude": 59.437,
+    "Longitude": 24.7536,
+    "Population": 460000,
+    "Elevation": 9,
+    "Year Founded": 1154,
+    "GDP": 25000000000,
+    "GDP per capita": 54000
+  },
+  {
+    "City": "Addis Ababa",
+    "Country": "Ethiopia",
+    "Latitude": 9.032,
+    "Longitude": 38.7469,
+    "Population": 5200000,
+    "Elevation": 2355,
+    "Year Founded": 1886,
+    "GDP": 35000000000,
+    "GDP per capita": 7000
+  },
+  {
+    "City": "Suva",
+    "Country": "Fiji",
+    "Latitude": -18.1416,
+    "Longitude": 178.4419,
+    "Population": 95000,
+    "Elevation": 5,
+    "Year Founded": 1882,
+    "GDP": 2000000000,
+    "GDP per capita": 21000
+  },
+  {
+    "City": "Helsinki",
+    "Country": "Finland",
+    "Latitude": 60.1699,
+    "Longitude": 24.9384,
+    "Population": 684000,
+    "Elevation": 26,
+    "Year Founded": 1550,
+    "GDP": 110000000000,
+    "GDP per capita": 161000
+  },
+  {
+    "City": "Lyon",
+    "Country": "France",
+    "Latitude": 45.764,
+    "Longitude": 4.8357,
+    "Population": 520000,
+    "Elevation": 173,
+    "Year Founded": 43,
+    "GDP": 75000000000,
+    "GDP per capita": 144000
+  },
+  {
+    "City": "Marseille",
+    "Country": "France",
+    "Latitude": 43.2965,
+    "Longitude": 5.3698,
+    "Population": 870000,
+    "Elevation": 28,
+    "Year Founded": 600,
+    "GDP": 80000000000,
+    "GDP per capita": 92000
+  },
+  {
+    "City": "Nice",
+    "Country": "France",
+    "Latitude": 43.7102,
+    "Longitude": 7.262,
+    "Population": 350000,
+    "Elevation": 10,
+    "Year Founded": 350,
+    "GDP": 45000000000,
+    "GDP per capita": 129000
+  },
+  {
+    "City": "Paris",
+    "Country": "France",
+    "Latitude": 48.8566,
+    "Longitude": 2.3522,
+    "Population": 2102650,
+    "Elevation": 35,
+    "Year Founded": -52,
+    "GDP": 1000000000000,
+    "GDP per capita": 475000
+  },
+  {
+    "City": "Batumi",
+    "Country": "Georgia",
+    "Latitude": 41.6168,
+    "Longitude": 41.6367,
+    "Population": 179185,
+    "Elevation": 3,
+    "Year Founded": 1878,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Tbilisi",
+    "Country": "Georgia",
+    "Latitude": 41.7151,
+    "Longitude": 44.8271,
+    "Population": 1200000,
+    "Elevation": 491,
+    "Year Founded": 458,
+    "GDP": 30000000000,
+    "GDP per capita": 25000
+  },
+  {
+    "City": "Berlin",
+    "Country": "Germany",
+    "Latitude": 52.52,
+    "Longitude": 13.405,
+    "Population": 3755251,
+    "Elevation": 34,
+    "Year Founded": 1237,
+    "GDP": 180000000000,
+    "GDP per capita": 48000
+  },
+  {
+    "City": "Hamburg",
+    "Country": "Germany",
+    "Latitude": 53.5511,
+    "Longitude": 9.9937,
+    "Population": 1900000,
+    "Elevation": 8,
+    "Year Founded": 808,
+    "GDP": 170000000000,
+    "GDP per capita": 89000
+  },
+  {
+    "City": "Munich",
+    "Country": "Germany",
+    "Latitude": 48.1351,
+    "Longitude": 11.582,
+    "Population": 1600000,
+    "Elevation": 519,
+    "Year Founded": 1158,
+    "GDP": 240000000000,
+    "GDP per capita": 150000
+  },
+  {
+    "City": "Accra",
+    "Country": "Ghana",
+    "Latitude": 5.6037,
+    "Longitude": -0.187,
+    "Population": 2500000,
+    "Elevation": 61,
+    "Year Founded": 1877,
+    "GDP": 35000000000,
+    "GDP per capita": 14000
+  },
+  {
+    "City": "Athens",
+    "Country": "Greece",
+    "Latitude": 37.9838,
+    "Longitude": 23.7275,
+    "Population": 664000,
+    "Elevation": 70,
+    "Year Founded": -508,
+    "GDP": 110000000000,
+    "GDP per capita": 166000
+  },
+  {
+    "City": "Guatemala City",
+    "Country": "Guatemala",
+    "Latitude": 14.6349,
+    "Longitude": -90.5069,
+    "Population": 3000000,
+    "Elevation": 1500,
+    "Year Founded": 1776,
+    "GDP": 55000000000,
+    "GDP per capita": 18000
+  },
+  {
+    "City": "Hong Kong",
+    "Country": "Hong Kong",
+    "Latitude": 22.3193,
+    "Longitude": 114.1694,
+    "Population": 7500000,
+    "Elevation": 35,
+    "Year Founded": 1841,
+    "GDP": 380000000000,
+    "GDP per capita": 51000
+  },
+  {
+    "City": "Budapest",
+    "Country": "Hungary",
+    "Latitude": 47.4979,
+    "Longitude": 19.0402,
+    "Population": 1680000,
+    "Elevation": 102,
+    "Year Founded": 1873,
+    "GDP": 90000000000,
+    "GDP per capita": 54000
+  },
+  {
+    "City": "Reykjavik",
+    "Country": "Iceland",
+    "Latitude": 64.1466,
+    "Longitude": -21.9426,
+    "Population": 140000,
+    "Elevation": 61,
+    "Year Founded": 874,
+    "GDP": 25000000000,
+    "GDP per capita": 179000
+  },
+  {
+    "City": "Agra",
+    "Country": "India",
+    "Latitude": 27.1753,
+    "Longitude": 78.0098,
+    "Population": 1585704,
+    "Elevation": 170,
+    "Year Founded": 1504,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Ahmedabad",
+    "Country": "India",
+    "Latitude": 23.0225,
+    "Longitude": 72.5714,
+    "Population": 8000000,
+    "Elevation": 53,
+    "Year Founded": 1411,
+    "GDP": 55000000000,
+    "GDP per capita": 7000
+  },
+  {
+    "City": "Bengaluru",
+    "Country": "India",
+    "Latitude": 12.9716,
+    "Longitude": 77.5946,
+    "Population": 13700000,
+    "Elevation": 920,
+    "Year Founded": 1537,
+    "GDP": 130000000000,
+    "GDP per capita": 9000
+  },
+  {
+    "City": "Chennai",
+    "Country": "India",
+    "Latitude": 13.0827,
+    "Longitude": 80.2707,
+    "Population": 7000000,
+    "Elevation": 6,
+    "Year Founded": 1639,
+    "GDP": 95000000000,
+    "GDP per capita": 14000
+  },
+  {
+    "City": "Delhi",
+    "Country": "India",
+    "Latitude": 28.6139,
+    "Longitude": 77.209,
+    "Population": 32900000,
+    "Elevation": 216,
+    "Year Founded": 1639,
+    "GDP": 293000000000,
+    "GDP per capita": 9000
+  },
+  {
+    "City": "Goa",
+    "Country": "India",
+    "Latitude": 15.4909,
+    "Longitude": 73.8278,
+    "Population": 40017,
+    "Elevation": 7,
+    "Year Founded": 1843,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Hyderabad",
+    "Country": "India",
+    "Latitude": 17.385,
+    "Longitude": 78.4867,
+    "Population": 10500000,
+    "Elevation": 542,
+    "Year Founded": 1591,
+    "GDP": 95000000000,
+    "GDP per capita": 9000
+  },
+  {
+    "City": "Jaipur",
+    "Country": "India",
+    "Latitude": 26.9124,
+    "Longitude": 75.7873,
+    "Population": 3100000,
+    "Elevation": 431,
+    "Year Founded": 1727,
+    "GDP": 30000000000,
+    "GDP per capita": 10000
+  },
+  {
+    "City": "Kolkata",
+    "Country": "India",
+    "Latitude": 22.5726,
+    "Longitude": 88.3639,
+    "Population": 5200000,
+    "Elevation": 9,
+    "Year Founded": 1690,
+    "GDP": 85000000000,
+    "GDP per capita": 16000
+  },
+  {
+    "City": "Mumbai",
+    "Country": "India",
+    "Latitude": 19.076,
+    "Longitude": 72.8777,
+    "Population": 20411000,
+    "Elevation": 14,
+    "Year Founded": 1507,
+    "GDP": 310000000000,
+    "GDP per capita": 15000
+  },
+  {
+    "City": "Pune",
+    "Country": "India",
+    "Latitude": 18.5204,
+    "Longitude": 73.8567,
+    "Population": 7000000,
+    "Elevation": 560,
+    "Year Founded": 937,
+    "GDP": 70000000000,
+    "GDP per capita": 10000
+  },
+  {
+    "City": "Varanasi",
+    "Country": "India",
+    "Latitude": 25.3176,
+    "Longitude": 82.9739,
+    "Population": 1198491,
+    "Elevation": 80,
+    "Year Founded": -1200,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Bali",
+    "Country": "Indonesia",
+    "Latitude": -8.4095,
+    "Longitude": 115.1889,
+    "Population": 4300000,
+    "Elevation": 500,
+    "Year Founded": 1343,
+    "GDP": 40000000000,
+    "GDP per capita": 9000
+  },
+  {
+    "City": "Jakarta",
+    "Country": "Indonesia",
+    "Latitude": -6.2088,
+    "Longitude": 106.8456,
+    "Population": 11000000,
+    "Elevation": 8,
+    "Year Founded": 1527,
+    "GDP": 300000000000,
+    "GDP per capita": 27000
+  },
+  {
+    "City": "Surabaya",
+    "Country": "Indonesia",
+    "Latitude": -7.2575,
+    "Longitude": 112.7521,
+    "Population": 2900000,
+    "Elevation": 5,
+    "Year Founded": 1293,
+    "GDP": 55000000000,
+    "GDP per capita": 19000
+  },
+  {
+    "City": "Yogyakarta",
+    "Country": "Indonesia",
+    "Latitude": -7.7956,
+    "Longitude": 110.3695,
+    "Population": 430000,
+    "Elevation": 113,
+    "Year Founded": 1755,
+    "GDP": 10000000000,
+    "GDP per capita": 23000
+  },
+  {
+    "City": "Isfahan",
+    "Country": "Iran",
+    "Latitude": 32.6546,
+    "Longitude": 51.668,
+    "Population": 2243000,
+    "Elevation": 1574,
+    "Year Founded": -500,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Tehran",
+    "Country": "Iran",
+    "Latitude": 35.6892,
+    "Longitude": 51.389,
+    "Population": 9000000,
+    "Elevation": 1200,
+    "Year Founded": 1789,
+    "GDP": 150000000000,
+    "GDP per capita": 17000
+  },
+  {
+    "City": "Baghdad",
+    "Country": "Iraq",
+    "Latitude": 33.3152,
+    "Longitude": 44.3661,
+    "Population": 8000000,
+    "Elevation": 34,
+    "Year Founded": 762,
+    "GDP": 50000000000,
+    "GDP per capita": 6000
+  },
+  {
+    "City": "Erbil",
+    "Country": "Iraq",
+    "Latitude": 36.1912,
+    "Longitude": 44.0094,
+    "Population": 1200000,
+    "Elevation": 390,
+    "Year Founded": -6000,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Dublin",
+    "Country": "Ireland",
+    "Latitude": 53.3498,
+    "Longitude": -6.2603,
+    "Population": 592000,
+    "Elevation": 20,
+    "Year Founded": 841,
+    "GDP": 180000000000,
+    "GDP per capita": 304000
+  },
+  {
+    "City": "Jerusalem",
+    "Country": "Israel",
+    "Latitude": 31.7683,
+    "Longitude": 35.2137,
+    "Population": 1000000,
+    "Elevation": 754,
+    "Year Founded": -1000,
+    "GDP": 45000000000,
+    "GDP per capita": 45000
+  },
+  {
+    "City": "Tel Aviv",
+    "Country": "Israel",
+    "Latitude": 32.0853,
+    "Longitude": 34.7818,
+    "Population": 470000,
+    "Elevation": 5,
+    "Year Founded": 1909,
+    "GDP": 60000000000,
+    "GDP per capita": 128000
+  },
+  {
+    "City": "Florence",
+    "Country": "Italy",
+    "Latitude": 43.7696,
+    "Longitude": 11.2558,
+    "Population": 380000,
+    "Elevation": 50,
+    "Year Founded": -59,
+    "GDP": 30000000000,
+    "GDP per capita": 79000
+  },
+  {
+    "City": "Milan",
+    "Country": "Italy",
+    "Latitude": 45.4642,
+    "Longitude": 9.19,
+    "Population": 1370000,
+    "Elevation": 120,
+    "Year Founded": -400,
+    "GDP": 245000000000,
+    "GDP per capita": 179000
+  },
+  {
+    "City": "Naples",
+    "Country": "Italy",
+    "Latitude": 40.8518,
+    "Longitude": 14.2681,
+    "Population": 910000,
+    "Elevation": 17,
+    "Year Founded": -600,
+    "GDP": 65000000000,
+    "GDP per capita": 71000
+  },
+  {
+    "City": "Rome",
+    "Country": "Italy",
+    "Latitude": 41.9028,
+    "Longitude": 12.4964,
+    "Population": 2872800,
+    "Elevation": 21,
+    "Year Founded": -753,
+    "GDP": 240000000000,
+    "GDP per capita": 84000
+  },
+  {
+    "City": "Venice",
+    "Country": "Italy",
+    "Latitude": 45.4408,
+    "Longitude": 12.3155,
+    "Population": 250000,
+    "Elevation": 2,
+    "Year Founded": 421,
+    "GDP": 35000000000,
+    "GDP per capita": 140000
+  },
+  {
+    "City": "Hiroshima",
+    "Country": "Japan",
+    "Latitude": 34.3853,
+    "Longitude": 132.4553,
+    "Population": 1170000,
+    "Elevation": 5,
+    "Year Founded": 1589,
+    "GDP": 45000000000,
+    "GDP per capita": 38000
+  },
+  {
+    "City": "Kobe",
+    "Country": "Japan",
+    "Latitude": 34.6901,
+    "Longitude": 135.1955,
+    "Population": 1500000,
+    "Elevation": 35,
+    "Year Founded": 1889,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Kyoto",
+    "Country": "Japan",
+    "Latitude": 35.0116,
+    "Longitude": 135.7681,
+    "Population": 1460000,
+    "Elevation": 50,
+    "Year Founded": 794,
+    "GDP": 70000000000,
+    "GDP per capita": 48000
+  },
+  {
+    "City": "Nara",
+    "Country": "Japan",
+    "Latitude": 34.6851,
+    "Longitude": 135.8048,
+    "Population": 352377,
+    "Elevation": 60,
+    "Year Founded": 710,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Osaka",
+    "Country": "Japan",
+    "Latitude": 34.6937,
+    "Longitude": 135.5023,
+    "Population": 2750000,
+    "Elevation": 5,
+    "Year Founded": 1889,
+    "GDP": 450000000000,
+    "GDP per capita": 164000
+  },
+  {
+    "City": "Sapporo",
+    "Country": "Japan",
+    "Latitude": 43.0618,
+    "Longitude": 141.3545,
+    "Population": 1970000,
+    "Elevation": 29,
+    "Year Founded": 1868,
+    "GDP": 65000000000,
+    "GDP per capita": 33000
+  },
+  {
+    "City": "Tokyo",
+    "Country": "Japan",
+    "Latitude": 35.6762,
+    "Longitude": 139.6503,
+    "Population": 14094000,
+    "Elevation": 40,
+    "Year Founded": 1603,
+    "GDP": 2100000000000,
+    "GDP per capita": 149000
+  },
+  {
+    "City": "Amman",
+    "Country": "Jordan",
+    "Latitude": 31.9539,
+    "Longitude": 35.9106,
+    "Population": 4000000,
+    "Elevation": 800,
+    "Year Founded": 725,
+    "GDP": 35000000000,
+    "GDP per capita": 9000
+  },
+  {
+    "City": "Mombasa",
+    "Country": "Kenya",
+    "Latitude": -4.0435,
+    "Longitude": 39.6682,
+    "Population": 1200000,
+    "Elevation": 50,
+    "Year Founded": 900,
+    "GDP": 8000000000,
+    "GDP per capita": 7000
+  },
+  {
+    "City": "Nairobi",
+    "Country": "Kenya",
+    "Latitude": -1.2921,
+    "Longitude": 36.8219,
+    "Population": 4846000,
+    "Elevation": 1795,
+    "Year Founded": 1899,
+    "GDP": 35000000000,
+    "GDP per capita": 7000
+  },
+  {
+    "City": "Kuwait City",
+    "Country": "Kuwait",
+    "Latitude": 29.3759,
+    "Longitude": 47.9774,
+    "Population": 3200000,
+    "Elevation": 28,
+    "Year Founded": 1716,
+    "GDP": 75000000000,
+    "GDP per capita": 23000
+  },
+  {
+    "City": "Riga",
+    "Country": "Latvia",
+    "Latitude": 56.9496,
+    "Longitude": 24.1052,
+    "Population": 605000,
+    "Elevation": 6,
+    "Year Founded": 1201,
+    "GDP": 30000000000,
+    "GDP per capita": 50000
+  },
+  {
+    "City": "Beirut",
+    "Country": "Lebanon",
+    "Latitude": 33.8938,
+    "Longitude": 35.5018,
+    "Population": 1100000,
+    "Elevation": 40,
+    "Year Founded": -1400,
+    "GDP": 30000000000,
+    "GDP per capita": 27000
+  },
+  {
+    "City": "Vilnius",
+    "Country": "Lithuania",
+    "Latitude": 54.6872,
+    "Longitude": 25.2797,
+    "Population": 600000,
+    "Elevation": 112,
+    "Year Founded": 1323,
+    "GDP": 30000000000,
+    "GDP per capita": 50000
+  },
+  {
+    "City": "Kuala Lumpur",
+    "Country": "Malaysia",
+    "Latitude": 3.139,
+    "Longitude": 101.6869,
+    "Population": 2000000,
+    "Elevation": 66,
+    "Year Founded": 1857,
+    "GDP": 200000000000,
+    "GDP per capita": 100000
+  },
+  {
+    "City": "Cancun",
+    "Country": "Mexico",
+    "Latitude": 21.1619,
+    "Longitude": -86.8515,
+    "Population": 900000,
+    "Elevation": 10,
+    "Year Founded": 1970,
+    "GDP": 30000000000,
+    "GDP per capita": 33000
+  },
+  {
+    "City": "Guadalajara",
+    "Country": "Mexico",
+    "Latitude": 20.6597,
+    "Longitude": -103.3496,
+    "Population": 1400000,
+    "Elevation": 1566,
+    "Year Founded": 1542,
+    "GDP": 110000000000,
+    "GDP per capita": 79000
+  },
+  {
+    "City": "Mexico City",
+    "Country": "Mexico",
+    "Latitude": 19.4326,
+    "Longitude": -99.1332,
+    "Population": 9209944,
+    "Elevation": 2240,
+    "Year Founded": 1325,
+    "GDP": 411000000000,
+    "GDP per capita": 45000
+  },
+  {
+    "City": "Monterrey",
+    "Country": "Mexico",
+    "Latitude": 25.6866,
+    "Longitude": -100.3161,
+    "Population": 1140000,
+    "Elevation": 540,
+    "Year Founded": 1596,
+    "GDP": 140000000000,
+    "GDP per capita": 123000
+  },
+  {
+    "City": "Oaxaca",
+    "Country": "Mexico",
+    "Latitude": 17.0732,
+    "Longitude": -96.7266,
+    "Population": 300000,
+    "Elevation": 1555,
+    "Year Founded": 1486,
+    "GDP": 8000000000,
+    "GDP per capita": 27000
+  },
+  {
+    "City": "Tijuana",
+    "Country": "Mexico",
+    "Latitude": 32.5149,
+    "Longitude": -117.0382,
+    "Population": 1922523,
+    "Elevation": 20,
+    "Year Founded": 1889,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Tulum",
+    "Country": "Mexico",
+    "Latitude": 20.2114,
+    "Longitude": -87.4654,
+    "Population": 46000,
+    "Elevation": 10,
+    "Year Founded": 100,
+    "GDP": 3000000000,
+    "GDP per capita": 65000
+  },
+  {
+    "City": "Monaco",
+    "Country": "Monaco",
+    "Latitude": 43.7384,
+    "Longitude": 7.4246,
+    "Population": 39000,
+    "Elevation": 35,
+    "Year Founded": 1215,
+    "GDP": 7000000000,
+    "GDP per capita": 180000
+  },
+  {
+    "City": "Casablanca",
+    "Country": "Morocco",
+    "Latitude": 33.5731,
+    "Longitude": -7.5898,
+    "Population": 3800000,
+    "Elevation": 27,
+    "Year Founded": 768,
+    "GDP": 110000000000,
+    "GDP per capita": 29000
+  },
+  {
+    "City": "Fez",
+    "Country": "Morocco",
+    "Latitude": 34.0181,
+    "Longitude": -5.0078,
+    "Population": 1100000,
+    "Elevation": 410,
+    "Year Founded": 789,
+    "GDP": 20000000000,
+    "GDP per capita": 18000
+  },
+  {
+    "City": "Marrakesh",
+    "Country": "Morocco",
+    "Latitude": 31.6295,
+    "Longitude": -7.9811,
+    "Population": 1000000,
+    "Elevation": 466,
+    "Year Founded": 1070,
+    "GDP": 25000000000,
+    "GDP per capita": 25000
+  },
+  {
+    "City": "Rabat",
+    "Country": "Morocco",
+    "Latitude": 34.0209,
+    "Longitude": -6.8416,
+    "Population": 580000,
+    "Elevation": 75,
+    "Year Founded": 1150,
+    "GDP": 30000000000,
+    "GDP per capita": 52000
+  },
+  {
+    "City": "Maputo",
+    "Country": "Mozambique",
+    "Latitude": -25.9692,
+    "Longitude": 32.5732,
+    "Population": 1200000,
+    "Elevation": 47,
+    "Year Founded": 1782,
+    "GDP": 20000000000,
+    "GDP per capita": 17000
+  },
+  {
+    "City": "Windhoek",
+    "Country": "Namibia",
+    "Latitude": -22.5609,
+    "Longitude": 17.0658,
+    "Population": 480000,
+    "Elevation": 1655,
+    "Year Founded": 1890,
+    "GDP": 12000000000,
+    "GDP per capita": 25000
+  },
+  {
+    "City": "Kathmandu",
+    "Country": "Nepal",
+    "Latitude": 27.7172,
+    "Longitude": 85.324,
+    "Population": 845000,
+    "Elevation": 1400,
+    "Year Founded": 723,
+    "GDP": 12000000000,
+    "GDP per capita": 14000
+  },
+  {
+    "City": "Pokhara",
+    "Country": "Nepal",
+    "Latitude": 28.2096,
+    "Longitude": 83.9856,
+    "Population": 599504,
+    "Elevation": 822,
+    "Year Founded": 1962,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Amsterdam",
+    "Country": "Netherlands",
+    "Latitude": 52.3676,
+    "Longitude": 4.9041,
+    "Population": 934000,
+    "Elevation": 2,
+    "Year Founded": 1275,
+    "GDP": 250000000000,
+    "GDP per capita": 268000
+  },
+  {
+    "City": "Auckland",
+    "Country": "New Zealand",
+    "Latitude": -36.8509,
+    "Longitude": 174.7645,
+    "Population": 1700000,
+    "Elevation": 43,
+    "Year Founded": 1840,
+    "GDP": 100000000000,
+    "GDP per capita": 59000
+  },
+  {
+    "City": "Christchurch",
+    "Country": "New Zealand",
+    "Latitude": -43.5321,
+    "Longitude": 172.6362,
+    "Population": 410000,
+    "Elevation": 20,
+    "Year Founded": 1850,
+    "GDP": 25000000000,
+    "GDP per capita": 61000
+  },
+  {
+    "City": "Queenstown",
+    "Country": "New Zealand",
+    "Latitude": -45.0312,
+    "Longitude": 168.6626,
+    "Population": 29000,
+    "Elevation": 310,
+    "Year Founded": 1863,
+    "GDP": 3000000000,
+    "GDP per capita": 103000
+  },
+  {
+    "City": "Wellington",
+    "Country": "New Zealand",
+    "Latitude": -41.2866,
+    "Longitude": 174.7756,
+    "Population": 215000,
+    "Elevation": 7,
+    "Year Founded": 1840,
+    "GDP": 25000000000,
+    "GDP per capita": 116000
+  },
+  {
+    "City": "Abuja",
+    "Country": "Nigeria",
+    "Latitude": 9.0765,
+    "Longitude": 7.3986,
+    "Population": 3600000,
+    "Elevation": 360,
+    "Year Founded": 1828,
+    "GDP": 20000000000,
+    "GDP per capita": 6000
+  },
+  {
+    "City": "Ibadan",
+    "Country": "Nigeria",
+    "Latitude": 7.3775,
+    "Longitude": 3.947,
+    "Population": 3500000,
+    "Elevation": 230,
+    "Year Founded": 1829,
+    "GDP": 8000000000,
+    "GDP per capita": 2000
+  },
+  {
+    "City": "Kano",
+    "Country": "Nigeria",
+    "Latitude": 12.0022,
+    "Longitude": 8.592,
+    "Population": 4000000,
+    "Elevation": 481,
+    "Year Founded": 999,
+    "GDP": 10000000000,
+    "GDP per capita": 3000
+  },
+  {
+    "City": "Lagos",
+    "Country": "Nigeria",
+    "Latitude": 6.5244,
+    "Longitude": 3.3792,
+    "Population": 15000000,
+    "Elevation": 41,
+    "Year Founded": 1760,
+    "GDP": 110000000000,
+    "GDP per capita": 7000
+  },
+  {
+    "City": "Port Harcourt",
+    "Country": "Nigeria",
+    "Latitude": 4.8156,
+    "Longitude": 7.0498,
+    "Population": 3000000,
+    "Elevation": 18,
+    "Year Founded": 1912,
+    "GDP": 10000000000,
+    "GDP per capita": 3000
+  },
+  {
+    "City": "Oslo",
+    "Country": "Norway",
+    "Latitude": 59.9139,
+    "Longitude": 10.7522,
+    "Population": 720000,
+    "Elevation": 23,
+    "Year Founded": 1400,
+    "GDP": 145000000000,
+    "GDP per capita": 201000
+  },
+  {
+    "City": "Muscat",
+    "Country": "Oman",
+    "Latitude": 23.588,
+    "Longitude": 58.3829,
+    "Population": 1600000,
+    "Elevation": 15,
+    "Year Founded": 1744,
+    "GDP": 45000000000,
+    "GDP per capita": 28000
+  },
+  {
+    "City": "Islamabad",
+    "Country": "Pakistan",
+    "Latitude": 33.6844,
+    "Longitude": 73.0479,
+    "Population": 1200000,
+    "Elevation": 540,
+    "Year Founded": 1960,
+    "GDP": 20000000000,
+    "GDP per capita": 17000
+  },
+  {
+    "City": "Karachi",
+    "Country": "Pakistan",
+    "Latitude": 24.8607,
+    "Longitude": 67.0011,
+    "Population": 16000000,
+    "Elevation": 8,
+    "Year Founded": 1729,
+    "GDP": 70000000000,
+    "GDP per capita": 4000
+  },
+  {
+    "City": "Lahore",
+    "Country": "Pakistan",
+    "Latitude": 31.5204,
+    "Longitude": 74.3587,
+    "Population": 13000000,
+    "Elevation": 217,
+    "Year Founded": 1000,
+    "GDP": 55000000000,
+    "GDP per capita": 4000
+  },
+  {
+    "City": "Rawalpindi",
+    "Country": "Pakistan",
+    "Latitude": 33.5651,
+    "Longitude": 73.0169,
+    "Population": 2098231,
+    "Elevation": 508,
+    "Year Founded": 1493,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Panama City",
+    "Country": "Panama",
+    "Latitude": 8.9824,
+    "Longitude": -79.5199,
+    "Population": 880000,
+    "Elevation": 2,
+    "Year Founded": 1673,
+    "GDP": 70000000000,
+    "GDP per capita": 80000
+  },
+  {
+    "City": "Port Moresby",
+    "Country": "Papua New Guinea",
+    "Latitude": -9.4438,
+    "Longitude": 147.1803,
+    "Population": 380000,
+    "Elevation": 35,
+    "Year Founded": 1873,
+    "GDP": 4000000000,
+    "GDP per capita": 11000
+  },
+  {
+    "City": "Asunción",
+    "Country": "Paraguay",
+    "Latitude": -25.2637,
+    "Longitude": -57.5759,
+    "Population": 520000,
+    "Elevation": 43,
+    "Year Founded": 1537,
+    "GDP": 25000000000,
+    "GDP per capita": 48000
+  },
+  {
+    "City": "Arequipa",
+    "Country": "Peru",
+    "Latitude": -16.409,
+    "Longitude": -71.5375,
+    "Population": 1000000,
+    "Elevation": 2335,
+    "Year Founded": 1540,
+    "GDP": 15000000000,
+    "GDP per capita": 15000
+  },
+  {
+    "City": "Cusco",
+    "Country": "Peru",
+    "Latitude": -13.5319,
+    "Longitude": -71.9675,
+    "Population": 430000,
+    "Elevation": 3399,
+    "Year Founded": 1100,
+    "GDP": 10000000000,
+    "GDP per capita": 23000
+  },
+  {
+    "City": "Lima",
+    "Country": "Peru",
+    "Latitude": -12.0464,
+    "Longitude": -77.0428,
+    "Population": 10300000,
+    "Elevation": 154,
+    "Year Founded": 1535,
+    "GDP": 140000000000,
+    "GDP per capita": 14000
+  },
+  {
+    "City": "Cebu City",
+    "Country": "Philippines",
+    "Latitude": 10.3157,
+    "Longitude": 123.8854,
+    "Population": 960000,
+    "Elevation": 17,
+    "Year Founded": 1565,
+    "GDP": 25000000000,
+    "GDP per capita": 26000
+  },
+  {
+    "City": "Manila",
+    "Country": "Philippines",
+    "Latitude": 14.5995,
+    "Longitude": 120.9842,
+    "Population": 1850000,
+    "Elevation": 16,
+    "Year Founded": 1571,
+    "GDP": 140000000000,
+    "GDP per capita": 76000
+  },
+  {
+    "City": "Warsaw",
+    "Country": "Poland",
+    "Latitude": 52.2297,
+    "Longitude": 21.0122,
+    "Population": 1860000,
+    "Elevation": 100,
+    "Year Founded": 1300,
+    "GDP": 145000000000,
+    "GDP per capita": 78000
+  },
+  {
+    "City": "Lisbon",
+    "Country": "Portugal",
+    "Latitude": 38.7223,
+    "Longitude": -9.1393,
+    "Population": 545000,
+    "Elevation": 2,
+    "Year Founded": -1200,
+    "GDP": 115000000000,
+    "GDP per capita": 211000
+  },
+  {
+    "City": "Porto",
+    "Country": "Portugal",
+    "Latitude": 41.1579,
+    "Longitude": -8.6291,
+    "Population": 250000,
+    "Elevation": 104,
+    "Year Founded": 275,
+    "GDP": 30000000000,
+    "GDP per capita": 120000
+  },
+  {
+    "City": "San Juan",
+    "Country": "Puerto Rico",
+    "Latitude": 18.4655,
+    "Longitude": -66.1057,
+    "Population": 340000,
+    "Elevation": 8,
+    "Year Founded": 1521,
+    "GDP": 40000000000,
+    "GDP per capita": 118000
+  },
+  {
+    "City": "Doha",
+    "Country": "Qatar",
+    "Latitude": 25.2854,
+    "Longitude": 51.531,
+    "Population": 1200000,
+    "Elevation": 10,
+    "Year Founded": 1825,
+    "GDP": 120000000000,
+    "GDP per capita": 100000
+  },
+  {
+    "City": "Bucharest",
+    "Country": "Romania",
+    "Latitude": 44.4268,
+    "Longitude": 26.1025,
+    "Population": 1710000,
+    "Elevation": 70,
+    "Year Founded": 1459,
+    "GDP": 80000000000,
+    "GDP per capita": 47000
+  },
+  {
+    "City": "Moscow",
+    "Country": "Russia",
+    "Latitude": 55.7558,
+    "Longitude": 37.6173,
+    "Population": 13100000,
+    "Elevation": 156,
+    "Year Founded": 1147,
+    "GDP": 450000000000,
+    "GDP per capita": 34000
+  },
+  {
+    "City": "Saint Petersburg",
+    "Country": "Russia",
+    "Latitude": 59.9311,
+    "Longitude": 30.3609,
+    "Population": 5600000,
+    "Elevation": 3,
+    "Year Founded": 1703,
+    "GDP": 120000000000,
+    "GDP per capita": 21000
+  },
+  {
+    "City": "Kigali",
+    "Country": "Rwanda",
+    "Latitude": -1.9441,
+    "Longitude": 30.0619,
+    "Population": 1300000,
+    "Elevation": 1567,
+    "Year Founded": 1907,
+    "GDP": 12000000000,
+    "GDP per capita": 9000
+  },
+  {
+    "City": "Jeddah",
+    "Country": "Saudi Arabia",
+    "Latitude": 21.4858,
+    "Longitude": 39.1925,
+    "Population": 4700000,
+    "Elevation": 12,
+    "Year Founded": 647,
+    "GDP": 100000000000,
+    "GDP per capita": 21000
+  },
+  {
+    "City": "Mecca",
+    "Country": "Saudi Arabia",
+    "Latitude": 21.3891,
+    "Longitude": 39.8579,
+    "Population": 2427924,
+    "Elevation": 277,
+    "Year Founded": -500,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Medina",
+    "Country": "Saudi Arabia",
+    "Latitude": 24.5247,
+    "Longitude": 39.5692,
+    "Population": 1411599,
+    "Elevation": 608,
+    "Year Founded": -600,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Riyadh",
+    "Country": "Saudi Arabia",
+    "Latitude": 24.7136,
+    "Longitude": 46.6753,
+    "Population": 7800000,
+    "Elevation": 612,
+    "Year Founded": 1744,
+    "GDP": 200000000000,
+    "GDP per capita": 26000
+  },
+  {
+    "City": "Dakar",
+    "Country": "Senegal",
+    "Latitude": 14.7167,
+    "Longitude": -17.4677,
+    "Population": 1200000,
+    "Elevation": 22,
+    "Year Founded": 1857,
+    "GDP": 25000000000,
+    "GDP per capita": 21000
+  },
+  {
+    "City": "Belgrade",
+    "Country": "Serbia",
+    "Latitude": 44.7866,
+    "Longitude": 20.4489,
+    "Population": 1400000,
+    "Elevation": 117,
+    "Year Founded": 279,
+    "GDP": 35000000000,
+    "GDP per capita": 25000
+  },
+  {
+    "City": "Singapore",
+    "Country": "Singapore",
+    "Latitude": 1.3521,
+    "Longitude": 103.8198,
+    "Population": 5920000,
+    "Elevation": 15,
+    "Year Founded": 1819,
+    "GDP": 850000000000,
+    "GDP per capita": 144000
+  },
+  {
+    "City": "Cape Town",
+    "Country": "South Africa",
+    "Latitude": -33.9249,
+    "Longitude": 18.4241,
+    "Population": 4900000,
+    "Elevation": 42,
+    "Year Founded": 1652,
+    "GDP": 100000000000,
+    "GDP per capita": 20000
+  },
+  {
+    "City": "Durban",
+    "Country": "South Africa",
+    "Latitude": -29.8587,
+    "Longitude": 31.0218,
+    "Population": 600000,
+    "Elevation": 22,
+    "Year Founded": 1835,
+    "GDP": 30000000000,
+    "GDP per capita": 50000
+  },
+  {
+    "City": "Johannesburg",
+    "Country": "South Africa",
+    "Latitude": -26.2041,
+    "Longitude": 28.0473,
+    "Population": 6000000,
+    "Elevation": 1753,
+    "Year Founded": 1886,
+    "GDP": 190000000000,
+    "GDP per capita": 32000
+  },
+  {
+    "City": "Pretoria",
+    "Country": "South Africa",
+    "Latitude": -25.7479,
+    "Longitude": 28.2293,
+    "Population": 800000,
+    "Elevation": 1339,
+    "Year Founded": 1855,
+    "GDP": 30000000000,
+    "GDP per capita": 38000
+  },
+  {
+    "City": "Busan",
+    "Country": "South Korea",
+    "Latitude": 35.1796,
+    "Longitude": 129.0756,
+    "Population": 3300000,
+    "Elevation": 15,
+    "Year Founded": 1876,
+    "GDP": 100000000000,
+    "GDP per capita": 30000
+  },
+  {
+    "City": "Seoul",
+    "Country": "South Korea",
+    "Latitude": 37.5665,
+    "Longitude": 126.978,
+    "Population": 9400000,
+    "Elevation": 38,
+    "Year Founded": 1394,
+    "GDP": 800000000000,
+    "GDP per capita": 85000
+  },
+  {
+    "City": "Barcelona",
+    "Country": "Spain",
+    "Latitude": 41.3874,
+    "Longitude": 2.1686,
+    "Population": 1660000,
+    "Elevation": 12,
+    "Year Founded": 15,
+    "GDP": 190000000000,
+    "GDP per capita": 114000
+  },
+  {
+    "City": "Madrid",
+    "Country": "Spain",
+    "Latitude": 40.4168,
+    "Longitude": -3.7038,
+    "Population": 3340000,
+    "Elevation": 667,
+    "Year Founded": 860,
+    "GDP": 260000000000,
+    "GDP per capita": 78000
+  },
+  {
+    "City": "Seville",
+    "Country": "Spain",
+    "Latitude": 37.3891,
+    "Longitude": -5.9845,
+    "Population": 690000,
+    "Elevation": 7,
+    "Year Founded": 712,
+    "GDP": 50000000000,
+    "GDP per capita": 72000
+  },
+  {
+    "City": "Valencia",
+    "Country": "Spain",
+    "Latitude": 39.4699,
+    "Longitude": -0.3763,
+    "Population": 800000,
+    "Elevation": 15,
+    "Year Founded": 138,
+    "GDP": 55000000000,
+    "GDP per capita": 69000
+  },
+  {
+    "City": "Colombo",
+    "Country": "Sri Lanka",
+    "Latitude": 6.9271,
+    "Longitude": 79.8612,
+    "Population": 750000,
+    "Elevation": 1,
+    "Year Founded": 1505,
+    "GDP": 25000000000,
+    "GDP per capita": 33000
+  },
+  {
+    "City": "Stockholm",
+    "Country": "Sweden",
+    "Latitude": 59.3293,
+    "Longitude": 18.0686,
+    "Population": 990000,
+    "Elevation": 28,
+    "Year Founded": 1250,
+    "GDP": 180000000000,
+    "GDP per capita": 182000
+  },
+  {
+    "City": "Bern",
+    "Country": "Switzerland",
+    "Latitude": 46.948,
+    "Longitude": 7.4474,
+    "Population": 146867,
+    "Elevation": 540,
+    "Year Founded": 1191,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Zurich",
+    "Country": "Switzerland",
+    "Latitude": 47.3769,
+    "Longitude": 8.5417,
+    "Population": 435000,
+    "Elevation": 408,
+    "Year Founded": 15,
+    "GDP": 150000000000,
+    "GDP per capita": 345000
+  },
+  {
+    "City": "Taipei",
+    "Country": "Taiwan",
+    "Latitude": 25.033,
+    "Longitude": 121.5654,
+    "Population": 2500000,
+    "Elevation": 10,
+    "Year Founded": 1709,
+    "GDP": 220000000000,
+    "GDP per capita": 88000
+  },
+  {
+    "City": "Arusha",
+    "Country": "Tanzania",
+    "Latitude": -3.3869,
+    "Longitude": 36.683,
+    "Population": 617631,
+    "Elevation": 1400,
+    "Year Founded": 1900,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Dar es Salaam",
+    "Country": "Tanzania",
+    "Latitude": -6.7924,
+    "Longitude": 39.2083,
+    "Population": 7400000,
+    "Elevation": 55,
+    "Year Founded": 1865,
+    "GDP": 25000000000,
+    "GDP per capita": 3000
+  },
+  {
+    "City": "Zanzibar City",
+    "Country": "Tanzania",
+    "Latitude": -27.3166,
+    "Longitude": 25.3029,
+    "Population": 55483,
+    "Elevation": 846,
+    "Year Founded": 1239,
+    "GDP": 1257382358,
+    "GDP per capita": 26588
+  },
+  {
+    "City": "Bangkok",
+    "Country": "Thailand",
+    "Latitude": 13.7563,
+    "Longitude": 100.5018,
+    "Population": 10500000,
+    "Elevation": 1,
+    "Year Founded": 1782,
+    "GDP": 290000000000,
+    "GDP per capita": 28000
+  },
+  {
+    "City": "Chiang Mai",
+    "Country": "Thailand",
+    "Latitude": 18.7883,
+    "Longitude": 98.9853,
+    "Population": 120000,
+    "Elevation": 310,
+    "Year Founded": 1296,
+    "GDP": 10000000000,
+    "GDP per capita": 83000
+  },
+  {
+    "City": "Pattaya",
+    "Country": "Thailand",
+    "Latitude": 12.9236,
+    "Longitude": 100.8825,
+    "Population": 119532,
+    "Elevation": 5,
+    "Year Founded": 1960,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Phuket",
+    "Country": "Thailand",
+    "Latitude": 7.8804,
+    "Longitude": 98.3923,
+    "Population": 100000,
+    "Elevation": 28,
+    "Year Founded": 1780,
+    "GDP": 15000000000,
+    "GDP per capita": 150000
+  },
+  {
+    "City": "Tunis",
+    "Country": "Tunisia",
+    "Latitude": 36.8065,
+    "Longitude": 10.1815,
+    "Population": 1050000,
+    "Elevation": 4,
+    "Year Founded": 698,
+    "GDP": 35000000000,
+    "GDP per capita": 33000
+  },
+  {
+    "City": "Istanbul",
+    "Country": "Turkey",
+    "Latitude": 41.0082,
+    "Longitude": 28.9784,
+    "Population": 15800000,
+    "Elevation": 40,
+    "Year Founded": 330,
+    "GDP": 300000000000,
+    "GDP per capita": 19000
+  },
+  {
+    "City": "Kampala",
+    "Country": "Uganda",
+    "Latitude": 0.3476,
+    "Longitude": 32.5825,
+    "Population": 1800000,
+    "Elevation": 1190,
+    "Year Founded": 1890,
+    "GDP": 18000000000,
+    "GDP per capita": 10000
+  },
+  {
+    "City": "Kyiv",
+    "Country": "Ukraine",
+    "Latitude": 50.4501,
+    "Longitude": 30.5234,
+    "Population": 2950000,
+    "Elevation": 179,
+    "Year Founded": 482,
+    "GDP": 70000000000,
+    "GDP per capita": 24000
+  },
+  {
+    "City": "Abu Dhabi",
+    "Country": "United Arab Emirates",
+    "Latitude": 24.4539,
+    "Longitude": 54.3773,
+    "Population": 1500000,
+    "Elevation": 27,
+    "Year Founded": 1760,
+    "GDP": 100000000000,
+    "GDP per capita": 67000
+  },
+  {
+    "City": "Dubai",
+    "Country": "United Arab Emirates",
+    "Latitude": 25.2048,
+    "Longitude": 55.2708,
+    "Population": 3600000,
+    "Elevation": 16,
+    "Year Founded": 1833,
+    "GDP": 120000000000,
+    "GDP per capita": 33000
+  },
+  {
+    "City": "Sharjah",
+    "Country": "United Arab Emirates",
+    "Latitude": 25.3463,
+    "Longitude": 55.4209,
+    "Population": 1800000,
+    "Elevation": 5,
+    "Year Founded": 1727,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Edinburgh",
+    "Country": "United Kingdom",
+    "Latitude": 55.9533,
+    "Longitude": -3.1883,
+    "Population": 550000,
+    "Elevation": 47,
+    "Year Founded": 1124,
+    "GDP": 95000000000,
+    "GDP per capita": 173000
+  },
+  {
+    "City": "Glasgow",
+    "Country": "United Kingdom",
+    "Latitude": 55.8642,
+    "Longitude": -4.2518,
+    "Population": 635000,
+    "Elevation": 40,
+    "Year Founded": 543,
+    "GDP": 80000000000,
+    "GDP per capita": 126000
+  },
+  {
+    "City": "London",
+    "Country": "United Kingdom",
+    "Latitude": 42.9849,
+    "Longitude": -81.2453,
+    "Population": 422324,
+    "Elevation": 251,
+    "Year Founded": 1826,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Anchorage",
+    "Country": "United States",
+    "Latitude": 61.2181,
+    "Longitude": -149.9003,
+    "Population": 290000,
+    "Elevation": 31,
+    "Year Founded": 1920,
+    "GDP": 45000000000,
+    "GDP per capita": 155000
+  },
+  {
+    "City": "Atlanta",
+    "Country": "United States",
+    "Latitude": 33.749,
+    "Longitude": -84.388,
+    "Population": 510823,
+    "Elevation": 320,
+    "Year Founded": 1837,
+    "GDP": 385000000000,
+    "GDP per capita": 754000
+  },
+  {
+    "City": "Austin",
+    "Country": "United States",
+    "Latitude": 30.2672,
+    "Longitude": -97.7431,
+    "Population": 979882,
+    "Elevation": 149,
+    "Year Founded": 1839,
+    "GDP": 215000000000,
+    "GDP per capita": 220000
+  },
+  {
+    "City": "Boston",
+    "Country": "United States",
+    "Latitude": 42.3601,
+    "Longitude": -71.0589,
+    "Population": 673458,
+    "Elevation": 43,
+    "Year Founded": 1630,
+    "GDP": 540000000000,
+    "GDP per capita": 802000
+  },
+  {
+    "City": "Chicago",
+    "Country": "United States",
+    "Latitude": 41.8781,
+    "Longitude": -87.6298,
+    "Population": 2665039,
+    "Elevation": 181,
+    "Year Founded": 1833,
+    "GDP": 895000000000,
+    "GDP per capita": 336000
+  },
+  {
+    "City": "Dallas",
+    "Country": "United States",
+    "Latitude": 32.7767,
+    "Longitude": -96.797,
+    "Population": 1302868,
+    "Elevation": 131,
+    "Year Founded": 1841,
+    "GDP": 740000000000,
+    "GDP per capita": 568000
+  },
+  {
+    "City": "Denver",
+    "Country": "United States",
+    "Latitude": 39.7392,
+    "Longitude": -104.9903,
+    "Population": 715522,
+    "Elevation": 1609,
+    "Year Founded": 1858,
+    "GDP": 350000000000,
+    "GDP per capita": 489000
+  },
+  {
+    "City": "Durham",
+    "Country": "United States",
+    "Latitude": 35.994,
+    "Longitude": -78.8986,
+    "Population": 296186,
+    "Elevation": 123,
+    "Year Founded": 1869,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Honolulu",
+    "Country": "United States",
+    "Latitude": 21.3069,
+    "Longitude": -157.8583,
+    "Population": 350964,
+    "Elevation": 5,
+    "Year Founded": 1900,
+    "GDP": 105000000000,
+    "GDP per capita": 299000
+  },
+  {
+    "City": "Houston",
+    "Country": "United States",
+    "Latitude": 29.7604,
+    "Longitude": -95.3698,
+    "Population": 2314157,
+    "Elevation": 13,
+    "Year Founded": 1836,
+    "GDP": 696999366000,
+    "GDP per capita": 255000
+  },
+  {
+    "City": "Las Vegas",
+    "Country": "United States",
+    "Latitude": 36.1716,
+    "Longitude": -115.1391,
+    "Population": 660929,
+    "Elevation": 610,
+    "Year Founded": 1905,
+    "GDP": 180000000000,
+    "GDP per capita": 272000
+  },
+  {
+    "City": "Los Angeles",
+    "Country": "United States",
+    "Latitude": 34.0522,
+    "Longitude": -118.2437,
+    "Population": 3820914,
+    "Elevation": 71,
+    "Year Founded": 1781,
+    "GDP": 1170000000000,
+    "GDP per capita": 306000
+  },
+  {
+    "City": "Miami",
+    "Country": "United States",
+    "Latitude": 25.7617,
+    "Longitude": -80.1918,
+    "Population": 455924,
+    "Elevation": 2,
+    "Year Founded": 1896,
+    "GDP": 190000000000,
+    "GDP per capita": 417000
+  },
+  {
+    "City": "Nashville",
+    "Country": "United States",
+    "Latitude": 36.1627,
+    "Longitude": -86.7816,
+    "Population": 715000,
+    "Elevation": 182,
+    "Year Founded": 1779,
+    "GDP": 105000000000,
+    "GDP per capita": 147000
+  },
+  {
+    "City": "New Orleans",
+    "Country": "United States",
+    "Latitude": 29.9511,
+    "Longitude": -90.0715,
+    "Population": 370000,
+    "Elevation": 2,
+    "Year Founded": 1718,
+    "GDP": 80000000000,
+    "GDP per capita": 216000
+  },
+  {
+    "City": "New York City",
+    "Country": "United States",
+    "Latitude": 40.7128,
+    "Longitude": -74.006,
+    "Population": 8478072,
+    "Elevation": 10,
+    "Year Founded": 1624,
+    "GDP": 2290000000000,
+    "GDP per capita": 270000
+  },
+  {
+    "City": "Philadelphia",
+    "Country": "United States",
+    "Latitude": 39.9526,
+    "Longitude": -75.1652,
+    "Population": 1550542,
+    "Elevation": 12,
+    "Year Founded": 1682,
+    "GDP": 540000000000,
+    "GDP per capita": 348000
+  },
+  {
+    "City": "San Antonio",
+    "Country": "United States",
+    "Latitude": 29.4241,
+    "Longitude": -98.4936,
+    "Population": 1472909,
+    "Elevation": 198,
+    "Year Founded": 1718,
+    "GDP": 210000000000,
+    "GDP per capita": 143000
+  },
+  {
+    "City": "San Diego",
+    "Country": "United States",
+    "Latitude": 32.7157,
+    "Longitude": -117.1611,
+    "Population": 1386932,
+    "Elevation": 20,
+    "Year Founded": 1769,
+    "GDP": 268000000000,
+    "GDP per capita": 193000
+  },
+  {
+    "City": "Seattle",
+    "Country": "United States",
+    "Latitude": 47.6062,
+    "Longitude": -122.3321,
+    "Population": 755078,
+    "Elevation": 56,
+    "Year Founded": 1851,
+    "GDP": 480000000000,
+    "GDP per capita": 636000
+  },
+  {
+    "City": "Washington, D.C.",
+    "Country": "United States",
+    "Latitude": 38.9072,
+    "Longitude": -77.0369,
+    "Population": 678972,
+    "Elevation": 7,
+    "Year Founded": 1790,
+    "GDP": 550000000000,
+    "GDP per capita": 810000
+  },
+  {
+    "City": "Montevideo",
+    "Country": "Uruguay",
+    "Latitude": -34.9011,
+    "Longitude": -56.1645,
+    "Population": 1400000,
+    "Elevation": 43,
+    "Year Founded": 1726,
+    "GDP": 55000000000,
+    "GDP per capita": 39000
+  },
+  {
+    "City": "Da Nang",
+    "Country": "Vietnam",
+    "Latitude": 16.0544,
+    "Longitude": 108.2022,
+    "Population": 1245000,
+    "Elevation": 7,
+    "Year Founded": 1888,
+    "GDP": null,
+    "GDP per capita": null
+  },
+  {
+    "City": "Hanoi",
+    "Country": "Vietnam",
+    "Latitude": 21.0278,
+    "Longitude": 105.8342,
+    "Population": 8400000,
+    "Elevation": 19,
+    "Year Founded": 1010,
+    "GDP": 70000000000,
+    "GDP per capita": 8000
+  },
+  {
+    "City": "Ho Chi Minh City",
+    "Country": "Vietnam",
+    "Latitude": 10.8231,
+    "Longitude": 106.6297,
+    "Population": 9600000,
+    "Elevation": 19,
+    "Year Founded": 1698,
+    "GDP": 110000000000,
+    "GDP per capita": 11000
+  },
+  {
+    "City": "Victoria Falls",
+    "Country": "Zimbabwe",
+    "Latitude": -17.9243,
+    "Longitude": 25.856,
+    "Population": 35761,
+    "Elevation": 961,
+    "Year Founded": 1901,
+    "GDP": null,
+    "GDP per capita": null
+  }
+];
 // Placeholder rows ("Regional City N" / Country "Various") are excluded from play.
 const EXCLUDE_PLACEHOLDERS = true;
 const DATA = RAW_CITIES.filter(c => !(EXCLUDE_PLACEHOLDERS && (c.Country === 'Various' || /^Regional City \d+$/i.test(c.City))));
@@ -74,7 +2825,9 @@ function pickMatchingCities(rnd=Math.random){
  return out;
 }
 function pickEstimateCity(rnd=Math.random){
- const pool=DATA.filter(c=>['Population','Year Founded','Elevation','GDP','Latitude'].every(k=>Number.isFinite(+c[k])));
+ const currentYear=new Date().getFullYear();
+ // Keep anomalous/future-dated source rows in DATA, but do not select them for a round whose year control intentionally stops at the latest valid observed year.
+ const pool=DATA.filter(c=>['Population','Year Founded','Elevation','GDP','Latitude'].every(k=>Number.isFinite(+c[k]))&&+c['Year Founded']<=currentYear);
  return pool[Math.floor(rnd()*pool.length)];
 }
 
@@ -220,21 +2973,17 @@ function sliderDef(){
  const clamp01=p=>Math.max(0,Math.min(1,p));
  // Population: logarithmic. The 20k floor preserves useful low-end resolution without approaching log(0).
  const popMin=Math.min(20000,Math.max(1000,Math.floor(pop.min/1000)*1000)),popMax=Math.ceil(pop.max/100000)*100000,popLogSpan=Math.log(popMax/popMin);
- // Established year: square-root of age. Use the rounded newest year as the age-zero anchor so future/anomalous rows remain representable.
- const yearMin=Math.floor(yr.min/100)*100,yearMax=Math.ceil(yr.max/100)*100,yearAnchor=yearMax,yearAgeMax=Math.max(1,yearAnchor-yearMin),yearRootMax=Math.sqrt(yearAgeMax);
+ // Established year: square-root of age. Ignore future/anomalous dates when setting the upper bound; stop at the latest valid year actually present in the dataset.
+ const currentYear=new Date().getFullYear(),validYears=DATA.map(c=>+c['Year Founded']).filter(v=>Number.isFinite(v)&&v<=currentYear),yearMin=Math.floor(yr.min/100)*100,yearMax=Math.max(...validYears),yearAnchor=yearMax,yearAgeMax=Math.max(1,yearAnchor-yearMin),yearRootMax=Math.sqrt(yearAgeMax);
  // Elevation: square-root scale in feet, with a rounded floor that can represent below-sea-level cities.
  const elevRawMin=el.min*3.28084,elevRawMax=el.max*3.28084,elevMin=Math.floor(elevRawMin/100)*100,elevMax=Math.ceil(elevRawMax/1000)*1000,elevSpan=elevMax-elevMin;
  // GDP: logarithmic across the full positive dataset range.
  const gdPos=DATA.map(c=>+c.GDP).filter(v=>Number.isFinite(v)&&v>0),gdpDataMin=Math.min(...gdPos),gdpMin=Math.pow(10,Math.floor(Math.log10(gdpDataMin))),gdpMax=Math.ceil(gd.max/Math.pow(10,Math.max(0,Math.floor(Math.log10(gd.max))-1)))*Math.pow(10,Math.max(0,Math.floor(Math.log10(gd.max))-1)),gdpLogSpan=Math.log(gdpMax/gdpMin);
- const popTicks=[20000,100000,500000,1000000,5000000,10000000,25000000,50000000];
- const yearTicks=[-2500,-500,1000,1500,1800,1900,2000,2100];
- const elevTicks=[-100,0,500,1500,3000,6000,10000,15000];
- const gdpTicks=[1e6,3e6,1e7,3e7,1e8,3e8,1e9,3e9,1e10,3e10,1e11,3e11,1e12];
  return {
-  population:{key:'Population',label:'Population',fmt:v=>popFmt(v).replace('Pop. ',''),toPos:v=>clamp01(Math.log(Math.max(popMin,v)/popMin)/popLogSpan),fromPos:p=>popMin*Math.exp(clamp01(p)*popLogSpan),ticks:popTicks.filter(v=>v>=popMin&&v<=popMax)},
-  year:{key:'Year Founded',label:'Year Established',fmt:yearShort,toPos:v=>clamp01(1-Math.sqrt(Math.max(0,yearAnchor-v))/yearRootMax),fromPos:p=>yearAnchor-Math.pow((1-clamp01(p))*yearRootMax,2),ticks:yearTicks.filter(v=>v>=yearMin&&v<=yearMax)},
-  elevation:{key:'Elevation',label:'Elevation',fmt:v=>`${Math.round(v).toLocaleString('en-US')} ft`,toPos:v=>clamp01(Math.sqrt(Math.max(0,(v-elevMin)/elevSpan))),fromPos:p=>elevMin+Math.pow(clamp01(p),2)*elevSpan,ticks:elevTicks.filter(v=>v>=elevMin&&v<=elevMax)},
-  gdp:{key:'GDP',label:'GDP',fmt:moneyFmt,toPos:v=>clamp01(Math.log(Math.max(gdpMin,v)/gdpMin)/gdpLogSpan),fromPos:p=>gdpMin*Math.exp(clamp01(p)*gdpLogSpan),ticks:gdpTicks.filter(v=>v>=gdpMin&&v<=gdpMax)}
+  population:{key:'Population',label:'Population',fmt:v=>popFmt(v).replace('Pop. ',''),toPos:v=>clamp01(Math.log(Math.max(popMin,v)/popMin)/popLogSpan),fromPos:p=>popMin*Math.exp(clamp01(p)*popLogSpan)},
+  year:{key:'Year Founded',label:'Year Established',fmt:yearShort,toPos:v=>clamp01(1-Math.sqrt(Math.max(0,yearAnchor-v))/yearRootMax),fromPos:p=>yearAnchor-Math.pow((1-clamp01(p))*yearRootMax,2)},
+  elevation:{key:'Elevation',label:'Elevation',fmt:v=>`${Math.round(v).toLocaleString('en-US')} ft`,toPos:v=>clamp01(Math.sqrt(Math.max(0,(v-elevMin)/elevSpan))),fromPos:p=>elevMin+Math.pow(clamp01(p),2)*elevSpan},
+  gdp:{key:'GDP',label:'GDP',fmt:moneyFmt,toPos:v=>clamp01(Math.log(Math.max(gdpMin,v)/gdpMin)/gdpLogSpan),fromPos:p=>gdpMin*Math.exp(clamp01(p)*gdpLogSpan)}
  };
 }
 function loadEstimateRound(){
@@ -246,12 +2995,11 @@ function buildEstimateBoard(){
 function initialEstimateValue(){return 500}
 function actualFor(name){const c=estimateState.city;if(name==='population')return +c.Population;if(name==='year')return +c['Year Founded'];if(name==='elevation')return +c.Elevation*3.28084;if(name==='gdp')return +c.GDP;if(name==='latitude')return +c.Latitude;return 0}
 function displayGuess(name,sliderValue){const d=estimateState.defs[name];return d.fmt(d.fromPos(+sliderValue/1000))}
-function scaleTicksHTML(d){return `<div class="scale-ticks">${d.ticks.map(v=>`<span style="left:${(d.toPos(v)*100).toFixed(2)}%">${esc(d.fmt(v))}</span>`).join('')}</div>`}
 function buildEstimateCard(name){
- const d=estimateState.defs[name],card=document.createElement('div');card.className='estimate-card';card.dataset.metric=name;card.innerHTML=`<div class="estimate-head"><span class="estimate-name">${esc(d.label)}</span><span class="estimate-value"></span></div><input class="estimate-range" type="range" min="0" max="1000" step="1" value="${initialEstimateValue()}">${scaleTicksHTML(d)}<div class="estimate-feedback"></div>`;const input=card.querySelector('input'),val=card.querySelector('.estimate-value');val.textContent=displayGuess(name,input.value);input.addEventListener('input',()=>{val.textContent=displayGuess(name,input.value)});return card;
+ const d=estimateState.defs[name],card=document.createElement('div');card.className='estimate-card';card.dataset.metric=name;card.innerHTML=`<div class="estimate-head"><span class="estimate-name">${esc(d.label)}</span><span class="estimate-value"></span></div><input class="estimate-range" type="range" min="0" max="1000" step="1" value="${initialEstimateValue()}"><div class="estimate-feedback"></div>`;const input=card.querySelector('input'),val=card.querySelector('.estimate-value');val.textContent=displayGuess(name,input.value);input.addEventListener('input',()=>{val.textContent=displayGuess(name,input.value)});return card;
 }
 function buildLatitudeCard(){
- const card=document.createElement('div');card.className='estimate-card latitude-card';card.dataset.metric='latitude';card.innerHTML=`<div class="estimate-head"><span class="estimate-name">Latitude</span><span class="estimate-value" id="latValue">0°</span></div><div class="latitude-wrap"><div class="lat-control"><input id="latSlider" class="lat-slider" type="range" min="-90" max="90" step="1" value="0"></div><div class="sphere" id="sphere"><canvas id="latitudeGradeCanvas" class="latitude-grade-canvas"></canvas><span class="lat-pole north">90° N</span><span class="lat-pole south">90° S</span><div id="latitudeRing" class="latitude-ring"></div><div id="latitudeAnswerRing" class="latitude-answer-ring hidden"></div></div></div><div class="range-ends"><span>90° S</span><span>Equator</span><span>90° N</span></div><div class="estimate-feedback"></div>`;card.querySelector('#latSlider').addEventListener('input',updateLatitudeVisual);return card;
+ const card=document.createElement('div');card.className='estimate-card latitude-card';card.dataset.metric='latitude';card.innerHTML=`<div class="estimate-head"><span class="estimate-name">Latitude</span><span class="estimate-value" id="latValue">0°</span></div><div class="latitude-wrap"><div class="lat-control"><input id="latSlider" class="lat-slider" type="range" min="-90" max="90" step="1" value="0"></div><div class="sphere" id="sphere"><canvas id="latitudeGradeCanvas" class="latitude-grade-canvas"></canvas><span class="lat-pole north">90° N</span><span class="lat-pole south">90° S</span><div id="latitudeRing" class="latitude-ring"></div><div id="latitudeAnswerRing" class="latitude-answer-ring hidden"></div></div></div><div class="estimate-feedback"></div>`;card.querySelector('#latSlider').addEventListener('input',updateLatitudeVisual);return card;
 }
 function positionLatitudeRing(el,lat){const sphere=$('#sphere');if(!el||!sphere)return;const r=sphere.clientWidth/2-3,y=r-r*Math.sin(lat*Math.PI/180),w=Math.max(2,2*r*Math.cos(lat*Math.PI/180));el.style.top=`${y+3}px`;el.style.width=`${w}px`;el.style.height=`${Math.max(4,w*.13)}px`}
 function updateLatitudeVisual(){const input=$('#latSlider'),ring=$('#latitudeRing');if(!input||!ring)return;const lat=+input.value;positionLatitudeRing(ring,lat);$('#latValue').textContent=`${Math.abs(lat)}° ${lat<0?'S':lat>0?'N':'Equator'}`}
@@ -296,7 +3044,7 @@ function loop(t){
 function endGame(){
  phase='idle';show('#endScreen');updateRibbon();$('#seqTxt').textContent='05/05';const d=today.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});$('#endMode').innerHTML=`<span class="lbl">Mode</span>${gameMode==='daily'?'DAILY':'INFINITE'}`;$('#endDate').textContent=isoDate;$('#endTitle').textContent=`City Stack - ${gameMode==='daily'?'Daily':'Infinite'} Mode`;$('#endSubtitle').textContent=gameMode==='daily'?d:'Five-round city knowledge record';$('#ledgerBody').innerHTML=results.map((r,i)=>`<tr><td class="num">${i+1}.</td><td class="round-code">${esc(r.code||r.name)}</td><td class="emoji-score">${scoreBar(r.score)}</td><td class="r num">${r.score}</td></tr>`).join('');$('#totalVal').textContent=scores.reduce((a,b)=>a+b,0);$('#copied').textContent='';
 }
-function scoreText(){const d=today.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),lines=results.map((r,i)=>`${i+1}. ${r.code||r.name} / ${scoreBar(r.score)} ${r.score}`).join('\n'),total=scores.reduce((a,b)=>a+b,0),title=gameMode==='daily'?`City Stack - Daily Mode - ${d}:`:'City Stack - Infinite Mode:';return `${title}\n${lines}\nTOTAL: ${total}/500`}
+function scoreText(){const lines=results.map((r,i)=>`${i+1}. ${r.code||r.name} / ${scoreBar(r.score)} ${r.score}`).join('\n'),total=scores.reduce((a,b)=>a+b,0);return `City Stack:\n${lines}\nTOTAL: ${total}/500`}
 async function copyScore(){const t=scoreText();try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}$('#copied').textContent='■ COPIED TO CLIPBOARD'}
 
 $('#dailyBtn').onclick=()=>startGame('daily');$('#infiniteBtn').onclick=()=>startGame('infinite');$('#actionBtn').onclick=onAction;$('#copyBtn').onclick=copyScore;$('#restartBtn').onclick=()=>{scores=[];results=[];round=0;phase='idle';show('#startScreen');updateRibbon();drawStart()};
